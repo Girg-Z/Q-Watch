@@ -5,7 +5,11 @@ plugins {
 
 android {
     namespace = "dev.girg.qwatch"
-    compileSdk = 37
+    compileSdk {
+        version = release(36) {
+            minorApiLevel = 1
+        }
+    }
 
     defaultConfig {
         applicationId = "dev.girg.qwatch"
@@ -38,7 +42,6 @@ android {
 dependencies {
     implementation(platform(libs.compose.bom))
     implementation(libs.activity.compose)
-    implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.material3)
     implementation(libs.ui)

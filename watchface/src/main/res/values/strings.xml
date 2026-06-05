@@ -1,0 +1,4 @@
+<resources>
+    <string name="watch_face_name">Q-Watch</string>
+    <string name="greeting">Hello, world!</string>
+</resources>

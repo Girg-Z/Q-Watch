@@ -6,36 +6,30 @@ import androidx.wear.watchface.complications.data.PlainComplicationText
 import androidx.wear.watchface.complications.data.ShortTextComplicationData
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
-import java.util.Calendar
+import dev.girg.qwatch.data.readStageStateFlow
+import kotlinx.coroutines.flow.first
 
-/**
- * Skeleton for complication data source that returns short text.
- */
 class MainComplicationService : SuspendingComplicationDataSourceService() {
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
-        if (type != ComplicationType.SHORT_TEXT) {
-            return null
-        }
-        return createComplicationData("Mon", "Monday")
+        if (type != ComplicationType.SHORT_TEXT) return null
+        return makeData("blue", "Sub Zero Project")
     }
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
-        return when (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
-            Calendar.SUNDAY -> createComplicationData("Sun", "Sunday")
-            Calendar.MONDAY -> createComplicationData("Mon", "Monday")
-            Calendar.TUESDAY -> createComplicationData("Tue", "Tuesday")
-            Calendar.WEDNESDAY -> createComplicationData("Wed", "Wednesday")
-            Calendar.THURSDAY -> createComplicationData("Thu", "Thursday")
-            Calendar.FRIDAY -> createComplicationData("Fri", "Friday")
-            Calendar.SATURDAY -> createComplicationData("Sat", "Saturday")
-            else -> throw IllegalArgumentException("too many days")
+        val state = applicationContext.readStageStateFlow().first()
+        val (text, title) = when {
+            !state.isFestivalActive -> "between" to ""
+            !state.isGpsAvailable  -> "gps_error" to ""
+            state.stageId == null  -> "between" to ""
+            else                   -> state.stageId to (state.artistName ?: "")
         }
+        return makeData(text, title)
     }
 
-    private fun createComplicationData(text: String, contentDescription: String) =
+    private fun makeData(text: String, title: String) =
         ShortTextComplicationData.Builder(
             text = PlainComplicationText.Builder(text).build(),
-            contentDescription = PlainComplicationText.Builder(contentDescription).build()
-        ).build()
+            contentDescription = PlainComplicationText.Builder(text).build()
+        ).setTitle(PlainComplicationText.Builder(title).build()).build()
 }

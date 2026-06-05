@@ -1,74 +1,303 @@
-<WatchFace
-    height="450"
-    width="450">
-    <Metadata
-        key="CLOCK_TYPE"
-        value="DIGITAL" />
-    <Scene>
-        <DigitalClock
-            height="450"
-            width="450"
-            x="0"
-            y="0">
-            <TimeText
-                format="hh:mm"
-                height="100"
-                width="450"
-                x="0"
-                y="175">
-                <Variant
-                    mode="AMBIENT"
-                    target="alpha"
-                    value="0" />
-                <Font
-                    color="#ffffffff"
-                    family="SYNC_TO_DEVICE"
-                    size="128" />
-            </TimeText>
-            <TimeText
-                alpha="0"
-                format="hh:mm"
-                height="100"
-                width="450"
-                x="0"
-                y="175">
-                <Variant
-                    mode="AMBIENT"
-                    target="alpha"
-                    value="255" />
-                <Font
-                    color="#ffffffff"
-                    family="SYNC_TO_DEVICE"
-                    size="128"
-                    weight="THIN" />
+<?xml version="1.0" encoding="utf-8"?>
+<WatchFace width="450" height="450">
+    <Metadata key="CLOCK_TYPE" value="DIGITAL" />
+    <Metadata key="PREVIEW_TIME" value="10:08:32" />
+
+    <Scene backgroundColor="#000000">
+
+        <ComplicationSlot
+            slotId="0"
+            supportedTypes="SHORT_TEXT"
+            name="stage_data"
+            isCustomizable="FALSE"
+            x="0" y="0" width="450" height="450">
+
+            <BoundingBox x="0" y="0" width="450" height="450" />
+
+            <DefaultProviderPolicy
+                defaultSystemProvider="EMPTY"
+                defaultSystemProviderType="SHORT_TEXT"
+                primaryProvider="dev.girg.qwatch/dev.girg.qwatch.complication.MainComplicationService"
+                primaryProviderType="SHORT_TEXT" />
+
+            <Complication type="SHORT_TEXT">
+                <Condition>
+                    <Expressions>
+                        <Expression name="isIndigo">[COMPLICATION.TEXT] == "indigo"</Expression>
+                        <Expression name="isBlue">[COMPLICATION.TEXT] == "blue"</Expression>
+                        <Expression name="isBlack">[COMPLICATION.TEXT] == "black"</Expression>
+                        <Expression name="isMagenta">[COMPLICATION.TEXT] == "magenta"</Expression>
+                        <Expression name="isYellow">[COMPLICATION.TEXT] == "yellow"</Expression>
+                        <Expression name="isPurple">[COMPLICATION.TEXT] == "purple"</Expression>
+                        <Expression name="isUv">[COMPLICATION.TEXT] == "uv"</Expression>
+                        <Expression name="isGold">[COMPLICATION.TEXT] == "gold"</Expression>
+                        <Expression name="isBrown">[COMPLICATION.TEXT] == "brown"</Expression>
+                        <Expression name="isRed">[COMPLICATION.TEXT] == "red"</Expression>
+                        <Expression name="isOrange">[COMPLICATION.TEXT] == "orange_light_district"</Expression>
+                    </Expressions>
+
+                    <Compare expression="isIndigo">
+                        <PartDraw x="0" y="0" width="450" height="450">
+                            <Rectangle x="0" y="0" width="450" height="450">
+                                <Fill color="#4B0082" />
+                            </Rectangle>
+                        </PartDraw>
+                        <PartText x="0" y="70" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="40" color="#FFFFFF" weight="BOLD">Indigo</Font>
+                            </Text>
+                        </PartText>
+                        <PartText x="0" y="195" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="34" color="#FFFFFF">
+                                    <Template>%s<Parameter expression="[COMPLICATION.TITLE]" /></Template>
+                                </Font>
+                            </Text>
+                        </PartText>
+                    </Compare>
+
+                    <Compare expression="isBlue">
+                        <PartDraw x="0" y="0" width="450" height="450">
+                            <Rectangle x="0" y="0" width="450" height="450">
+                                <Fill color="#1565C0" />
+                            </Rectangle>
+                        </PartDraw>
+                        <PartText x="0" y="70" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="40" color="#FFFFFF" weight="BOLD">Blue</Font>
+                            </Text>
+                        </PartText>
+                        <PartText x="0" y="195" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="34" color="#FFFFFF">
+                                    <Template>%s<Parameter expression="[COMPLICATION.TITLE]" /></Template>
+                                </Font>
+                            </Text>
+                        </PartText>
+                    </Compare>
+
+                    <Compare expression="isBlack">
+                        <PartDraw x="0" y="0" width="450" height="450">
+                            <Rectangle x="0" y="0" width="450" height="450">
+                                <Fill color="#212121" />
+                            </Rectangle>
+                        </PartDraw>
+                        <PartText x="0" y="70" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="40" color="#FFFFFF" weight="BOLD">Black</Font>
+                            </Text>
+                        </PartText>
+                        <PartText x="0" y="195" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="34" color="#FFFFFF">
+                                    <Template>%s<Parameter expression="[COMPLICATION.TITLE]" /></Template>
+                                </Font>
+                            </Text>
+                        </PartText>
+                    </Compare>
+
+                    <Compare expression="isMagenta">
+                        <PartDraw x="0" y="0" width="450" height="450">
+                            <Rectangle x="0" y="0" width="450" height="450">
+                                <Fill color="#880E4F" />
+                            </Rectangle>
+                        </PartDraw>
+                        <PartText x="0" y="70" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="40" color="#FFFFFF" weight="BOLD">Magenta</Font>
+                            </Text>
+                        </PartText>
+                        <PartText x="0" y="195" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="34" color="#FFFFFF">
+                                    <Template>%s<Parameter expression="[COMPLICATION.TITLE]" /></Template>
+                                </Font>
+                            </Text>
+                        </PartText>
+                    </Compare>
+
+                    <Compare expression="isYellow">
+                        <PartDraw x="0" y="0" width="450" height="450">
+                            <Rectangle x="0" y="0" width="450" height="450">
+                                <Fill color="#F9A825" />
+                            </Rectangle>
+                        </PartDraw>
+                        <PartText x="0" y="70" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="40" color="#000000" weight="BOLD">Yellow</Font>
+                            </Text>
+                        </PartText>
+                        <PartText x="0" y="195" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="34" color="#000000">
+                                    <Template>%s<Parameter expression="[COMPLICATION.TITLE]" /></Template>
+                                </Font>
+                            </Text>
+                        </PartText>
+                    </Compare>
+
+                    <Compare expression="isPurple">
+                        <PartDraw x="0" y="0" width="450" height="450">
+                            <Rectangle x="0" y="0" width="450" height="450">
+                                <Fill color="#6A1B9A" />
+                            </Rectangle>
+                        </PartDraw>
+                        <PartText x="0" y="70" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="40" color="#FFFFFF" weight="BOLD">Purple</Font>
+                            </Text>
+                        </PartText>
+                        <PartText x="0" y="195" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="34" color="#FFFFFF">
+                                    <Template>%s<Parameter expression="[COMPLICATION.TITLE]" /></Template>
+                                </Font>
+                            </Text>
+                        </PartText>
+                    </Compare>
+
+                    <Compare expression="isUv">
+                        <PartDraw x="0" y="0" width="450" height="450">
+                            <Rectangle x="0" y="0" width="450" height="450">
+                                <Fill color="#0D0D0D" />
+                            </Rectangle>
+                        </PartDraw>
+                        <PartText x="0" y="70" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="40" color="#7CFC00" weight="BOLD">UV</Font>
+                            </Text>
+                        </PartText>
+                        <PartText x="0" y="195" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="34" color="#7CFC00">
+                                    <Template>%s<Parameter expression="[COMPLICATION.TITLE]" /></Template>
+                                </Font>
+                            </Text>
+                        </PartText>
+                    </Compare>
+
+                    <Compare expression="isGold">
+                        <PartDraw x="0" y="0" width="450" height="450">
+                            <Rectangle x="0" y="0" width="450" height="450">
+                                <Fill color="#B8860B" />
+                            </Rectangle>
+                        </PartDraw>
+                        <PartText x="0" y="70" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="40" color="#000000" weight="BOLD">Gold</Font>
+                            </Text>
+                        </PartText>
+                        <PartText x="0" y="195" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="34" color="#000000">
+                                    <Template>%s<Parameter expression="[COMPLICATION.TITLE]" /></Template>
+                                </Font>
+                            </Text>
+                        </PartText>
+                    </Compare>
+
+                    <Compare expression="isBrown">
+                        <PartDraw x="0" y="0" width="450" height="450">
+                            <Rectangle x="0" y="0" width="450" height="450">
+                                <Fill color="#5D4037" />
+                            </Rectangle>
+                        </PartDraw>
+                        <PartText x="0" y="70" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="40" color="#FFFFFF" weight="BOLD">Brown</Font>
+                            </Text>
+                        </PartText>
+                        <PartText x="0" y="195" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="34" color="#FFFFFF">
+                                    <Template>%s<Parameter expression="[COMPLICATION.TITLE]" /></Template>
+                                </Font>
+                            </Text>
+                        </PartText>
+                    </Compare>
+
+                    <Compare expression="isRed">
+                        <PartDraw x="0" y="0" width="450" height="450">
+                            <Rectangle x="0" y="0" width="450" height="450">
+                                <Fill color="#B71C1C" />
+                            </Rectangle>
+                        </PartDraw>
+                        <PartText x="0" y="70" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="40" color="#FFFFFF" weight="BOLD">Red</Font>
+                            </Text>
+                        </PartText>
+                        <PartText x="0" y="195" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="34" color="#FFFFFF">
+                                    <Template>%s<Parameter expression="[COMPLICATION.TITLE]" /></Template>
+                                </Font>
+                            </Text>
+                        </PartText>
+                    </Compare>
+
+                    <Compare expression="isOrange">
+                        <PartDraw x="0" y="0" width="450" height="450">
+                            <Rectangle x="0" y="0" width="450" height="450">
+                                <Fill color="#E65100" />
+                            </Rectangle>
+                        </PartDraw>
+                        <PartText x="0" y="70" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="40" color="#FFFFFF" weight="BOLD">OL District</Font>
+                            </Text>
+                        </PartText>
+                        <PartText x="0" y="195" width="450" height="60">
+                            <Text align="CENTER">
+                                <Font family="SYNC_TO_DEVICE" size="34" color="#FFFFFF">
+                                    <Template>%s<Parameter expression="[COMPLICATION.TITLE]" /></Template>
+                                </Font>
+                            </Text>
+                        </PartText>
+                    </Compare>
+
+                    <!-- Default handles both "between" (no stage matched) and "gps_error" -->
+                    <Default>
+                        <Condition>
+                            <Expressions>
+                                <Expression name="isGpsError">[COMPLICATION.TEXT] == "gps_error"</Expression>
+                            </Expressions>
+                            <Compare expression="isGpsError">
+                                <PartText x="0" y="195" width="450" height="60">
+                                    <Text align="CENTER">
+                                        <Font family="SYNC_TO_DEVICE" size="30" color="#AAAAAA">GPS unavailable</Font>
+                                    </Text>
+                                </PartText>
+                            </Compare>
+                            <Default />
+                        </Condition>
+                    </Default>
+
+                </Condition>
+            </Complication>
+
+            <!-- Hide the entire complication slot in ambient mode -->
+            <Variant mode="AMBIENT" target="alpha" value="0" />
+
+        </ComplicationSlot>
+
+        <!-- Active time (hidden in ambient) -->
+        <DigitalClock x="0" y="290" width="450" height="56">
+            <TimeText format="hh:mm" hourFormat="24" align="CENTER"
+                      x="0" y="0" width="450" height="56">
+                <Variant mode="AMBIENT" target="alpha" value="0" />
+                <Font family="SYNC_TO_DEVICE" size="36" color="#FFFFFF" />
             </TimeText>
         </DigitalClock>
-        <Group
-            name="hello_world"
-            height="450"
-            width="450"
-            x="0"
-            y="0">
-            <PartText
-                height="50"
-                width="450"
-                x="0"
-                y="285">
-                <Variant
-                    mode="AMBIENT"
-                    target="alpha"
-                    value="0" />
-                <Text>
-                    <Font
-                        color="#ffffffff"
-                        family="SYNC_TO_DEVICE"
-                        size="36">
-                        <Template>%s
-                            <Parameter expression="greeting" />
-                        </Template>
-                    </Font>
-                </Text>
-            </PartText>
-        </Group>
+
+        <!-- Ambient time (hidden in active, large centered) -->
+        <DigitalClock x="0" y="150" width="450" height="150">
+            <TimeText format="hh:mm" hourFormat="24" align="CENTER"
+                      x="0" y="0" width="450" height="150" alpha="0">
+                <Variant mode="AMBIENT" target="alpha" value="255" />
+                <Font family="SYNC_TO_DEVICE" size="80" color="#FFFFFF" weight="THIN" />
+            </TimeText>
+        </DigitalClock>
+
     </Scene>
 </WatchFace>

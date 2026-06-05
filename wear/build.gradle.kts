@@ -56,7 +56,6 @@ dependencies {
     implementation(libs.datastore.preferences)
     implementation(libs.play.services.location)
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.core.ktx)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)
     debugImplementation(libs.tiles.renderer)

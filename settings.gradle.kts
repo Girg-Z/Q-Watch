@@ -25,3 +25,4 @@ dependencyResolutionManagement {
 rootProject.name = "Q-Watch"
 include(":watchface")
 include(":wear")
+include(":mobile")

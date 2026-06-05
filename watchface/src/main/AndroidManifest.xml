@@ -2,24 +2,35 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-feature android:name="android.hardware.type.watch" />
-    <!-- Note: hasCode is required to be false for Watch Face Format -->
+
     <application
         android:hasCode="false"
         android:label="@string/watch_face_name">
+
         <meta-data
             android:name="com.google.android.wearable.standalone"
             android:value="true" />
 
         <property
             android:name="com.google.wear.watchface.format.version"
-            android:value="1" />
+            android:value="2" />
 
-        <!-- Optionally add details about the publisher. -->
-        <!--
-           <property
-          android:name="com.google.wear.watchface.format.publisher"
-          android:value="YourPublisherNameHere" />
-        -->
+        <service
+            android:name="androidx.wear.watchface.WatchFaceRuntimeService"
+            android:exported="true"
+            android:permission="android.permission.BIND_WALLPAPER">
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+                <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/watch_face_info" />
+            <meta-data
+                android:name="com.google.android.wearable.watchface.preview"
+                android:resource="@drawable/preview" />
+        </service>
+
     </application>
 
 </manifest>

@@ -5,11 +5,7 @@ plugins {
 
 android {
     namespace = "dev.girg.qwatch"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "dev.girg.qwatch"
@@ -57,6 +53,10 @@ dependencies {
     implementation(libs.ui.tooling.preview)
     implementation(libs.watchface.complications.data.source.ktx)
     implementation(libs.wear.tooling.preview)
+    implementation(libs.datastore.preferences)
+    implementation(libs.play.services.location)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.core.ktx)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)
     debugImplementation(libs.tiles.renderer)

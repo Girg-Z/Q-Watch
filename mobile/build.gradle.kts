@@ -5,11 +5,7 @@ plugins {
 
 android {
     namespace = "dev.girg.qwatch"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "dev.girg.qwatch"

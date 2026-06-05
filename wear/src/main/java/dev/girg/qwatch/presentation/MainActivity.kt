@@ -1,115 +1,174 @@
-/* While this template provides a good starting point for using Wear Compose, you can always
- * take a look at https://github.com/android/wear-os-samples/tree/main/ComposeStarter to find the
- * most up to date changes to the libraries and their usages.
- */
-
 package dev.girg.qwatch.presentation
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.AppScaffold
 import androidx.wear.compose.material3.Button
-import androidx.wear.compose.material3.ButtonDefaults
-import androidx.wear.compose.material3.EdgeButton
 import androidx.wear.compose.material3.ListHeader
-import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.SurfaceTransformation
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import androidx.wear.compose.material3.lazy.transformedHeight
-import androidx.wear.compose.ui.tooling.preview.WearPreviewDevices
-import androidx.wear.compose.ui.tooling.preview.WearPreviewFontScales
-import dev.girg.qwatch.R
+import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
+import dev.girg.qwatch.complication.MainComplicationService
+import dev.girg.qwatch.data.StageState
+import dev.girg.qwatch.data.readStageStateFlow
+import dev.girg.qwatch.data.writeStageState
 import dev.girg.qwatch.presentation.theme.QWatchTheme
+import dev.girg.qwatch.service.LocationForegroundService
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) startLocationService()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            WearApp("Android")
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            startLocationService()
+        } else {
+            requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
         }
+        setContent {
+            QWatchTheme {
+                DebugScreen(context = this)
+            }
+        }
+    }
+
+    private fun startLocationService() {
+        startForegroundService(Intent(this, LocationForegroundService::class.java))
     }
 }
 
 @Composable
-fun WearApp(greetingName: String) {
-    QWatchTheme {
-        AppScaffold {
-            val listState = rememberTransformingLazyColumnState()
-            val transformationSpec = rememberTransformationSpec()
-            ScreenScaffold(
-                scrollState = listState,
-                edgeButton = {
-                    EdgeButton(
-                        onClick = { /*TODO*/ },
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                            ),
-                    ) {
-                        Text("More")
-                    }
-                },
-            ) { contentPadding -> // ScreenScaffold provides default padding; adjust as needed
-                TransformingLazyColumn(contentPadding = contentPadding, state = listState) {
-                    item {
-                        ListHeader(
-                            modifier =
-                                Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
-                            transformation = SurfaceTransformation(transformationSpec),
-                        ) {
-                            Text(text = stringResource(R.string.hello_world, greetingName))
-                        }
-                    }
-                    item {
-                        Button(
-                            onClick = { /*TODO*/ },
-                            modifier = Modifier.fillMaxWidth()
-                                .transformedHeight(this, transformationSpec),
-                            transformation = SurfaceTransformation(transformationSpec),
-                        ) {
-                            Text("Button A")
-                        }
-                    }
-                    item {
-                        Button(
-                            onClick = { /*TODO*/ },
-                            modifier = Modifier.fillMaxWidth()
-                                .transformedHeight(this, transformationSpec),
-                            transformation = SurfaceTransformation(transformationSpec),
-                        ) {
-                            Text("Button B")
-                        }
-                    }
-                    item {
-                        Button(
-                            onClick = { /*TODO*/ },
-                            modifier = Modifier.fillMaxWidth()
-                                .transformedHeight(this, transformationSpec),
-                            transformation = SurfaceTransformation(transformationSpec),
-                        ) {
-                            Text("Button C")
-                        }
-                    }
+fun DebugScreen(context: Context) {
+    val state by context.readStageStateFlow().collectAsState(initial = StageState())
+    val scope = rememberCoroutineScope()
+    val listState = rememberTransformingLazyColumnState()
+    val transformSpec = rememberTransformationSpec()
+    val timeFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
 
+    fun writeDebugState(newState: StageState) {
+        scope.launch {
+            context.writeStageState(newState)
+            Log.d("MainActivity", "Debug state written: $newState")
+            ComplicationDataSourceUpdateRequester
+                .create(context, ComponentName(context, MainComplicationService::class.java))
+                .requestUpdateAll()
+        }
+    }
+
+    AppScaffold {
+        ScreenScaffold(scrollState = listState) { padding ->
+            TransformingLazyColumn(contentPadding = padding, state = listState) {
+
+                item {
+                    ListHeader(
+                        modifier = Modifier.fillMaxWidth().transformedHeight(this, transformSpec),
+                        transformation = SurfaceTransformation(transformSpec)
+                    ) { Text("QWatch Debug") }
+                }
+
+                item {
+                    Text(
+                        text = buildString {
+                            appendLine("Stage: ${state.stageId ?: "—"}")
+                            appendLine("Artist: ${state.artistName ?: "none"}")
+                            appendLine("GPS: ${if (state.isGpsAvailable) "yes" else "no"}")
+                            appendLine("Festival: ${if (state.isFestivalActive) "yes" else "no"}")
+                            append("Updated: ${if (state.lastUpdateMillis > 0) timeFormat.format(Date(state.lastUpdateMillis)) else "—"}")
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                item {
+                    ListHeader(
+                        modifier = Modifier.fillMaxWidth().transformedHeight(this, transformSpec),
+                        transformation = SurfaceTransformation(transformSpec)
+                    ) { Text("Stages") }
+                }
+
+                val stageIds = listOf(
+                    "blue" to "BLUE", "indigo" to "INDIGO", "black" to "BLACK",
+                    "magenta" to "MAGENTA", "yellow" to "YELLOW", "purple" to "PURPLE",
+                    "uv" to "UV", "gold" to "GOLD", "brown" to "BROWN",
+                    "red" to "RED", "orange_light_district" to "ORANGE"
+                )
+                stageIds.forEach { (id, displayName) ->
+                    item {
+                        Button(
+                            onClick = {
+                                writeDebugState(StageState(
+                                    stageId = id,
+                                    stageName = displayName,
+                                    artistName = "Test Artist",
+                                    isGpsAvailable = true,
+                                    isFestivalActive = true,
+                                    lastUpdateMillis = System.currentTimeMillis()
+                                ))
+                            },
+                            modifier = Modifier.fillMaxWidth().transformedHeight(this, transformSpec),
+                            transformation = SurfaceTransformation(transformSpec)
+                        ) { Text(id) }
+                    }
+                }
+
+                item {
+                    Button(
+                        onClick = {
+                            writeDebugState(StageState(isFestivalActive = true, isGpsAvailable = true, lastUpdateMillis = System.currentTimeMillis()))
+                        },
+                        modifier = Modifier.fillMaxWidth().transformedHeight(this, transformSpec),
+                        transformation = SurfaceTransformation(transformSpec)
+                    ) { Text("between") }
+                }
+
+                item {
+                    Button(
+                        onClick = {
+                            writeDebugState(StageState(isGpsAvailable = false, lastUpdateMillis = System.currentTimeMillis()))
+                        },
+                        modifier = Modifier.fillMaxWidth().transformedHeight(this, transformSpec),
+                        transformation = SurfaceTransformation(transformSpec)
+                    ) { Text("gps_error") }
+                }
+
+                item {
+                    Button(
+                        onClick = { writeDebugState(StageState()) },
+                        modifier = Modifier.fillMaxWidth().transformedHeight(this, transformSpec),
+                        transformation = SurfaceTransformation(transformSpec)
+                    ) { Text("Reset") }
                 }
             }
         }
     }
-}
-
-@WearPreviewDevices
-@WearPreviewFontScales
-@Composable
-fun DefaultPreview() {
-    WearApp("Preview Android")
 }

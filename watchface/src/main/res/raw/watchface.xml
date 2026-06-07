@@ -8,13 +8,16 @@
         <!-- ================================================================
              SLOT 0 — arc + artist (RANGED_VALUE)
                value = set progress 0-100
-               text  = stage hex color e.g. "#0BDBEF"  (or "#606060" / "#303030")
-               title = artist name (empty when not at a stage)
-             All rendering stays inside this slot's own Complication context
-             so [COMPLICATION.TEXT/TITLE/RANGED_VALUE_CURRENT] are own-slot
-             references that the WFF runtime supports. The stage hex color is
-             used directly as the arc stroke color and artist font color —
-             no 14-way branch needed.
+               text  = stage hex color e.g. "#0BDBEF"
+               title = artist name
+
+             Arc is rendered at SCENE level because endAngle arithmetic
+             expressions only work at Scene level, not inside a Complication
+             context. Stroke color uses [COMPLICATION_0.TEXT] cross-slot.
+
+             Artist name is rendered INSIDE this slot's own Complication
+             context using [COMPLICATION.TEXT/TITLE] (own-slot), where Font
+             color expressions are confirmed to work.
              ================================================================ -->
         <ComplicationSlot
             slotId="0"
@@ -29,30 +32,7 @@
                 primaryProvider="dev.girg.qwatch/dev.girg.qwatch.complication.NowPlayingComplicationService"
                 primaryProviderType="RANGED_VALUE" />
             <Complication type="RANGED_VALUE">
-                <!-- Arc track — full circle, stage color at 16% opacity -->
-                <PartDraw x="18" y="18" width="414" height="414" alpha="41">
-                    <Variant mode="AMBIENT" target="alpha" value="0" />
-                    <Arc direction="CLOCKWISE" startAngle="-90" endAngle="270">
-                        <Stroke cap="ROUND" color="[COMPLICATION.TEXT]" thickness="13" />
-                    </Arc>
-                </PartDraw>
-                <!-- Arc fill — progress sweep, stage color full opacity -->
-                <PartDraw x="18" y="18" width="414" height="414">
-                    <Variant mode="AMBIENT" target="alpha" value="0" />
-                    <Arc direction="CLOCKWISE" startAngle="-90.0"
-                         endAngle="-90.0 + [COMPLICATION.RANGED_VALUE_CURRENT] * 3.6">
-                        <Stroke cap="ROUND" color="[COMPLICATION.TEXT]" thickness="13" />
-                    </Arc>
-                </PartDraw>
-                <!-- Arc fill — ambient mode, thin stroke at 30% opacity -->
-                <PartDraw x="18" y="18" width="414" height="414" alpha="0">
-                    <Variant mode="AMBIENT" target="alpha" value="77" />
-                    <Arc direction="CLOCKWISE" startAngle="-90.0"
-                         endAngle="-90.0 + [COMPLICATION.RANGED_VALUE_CURRENT] * 3.6">
-                        <Stroke cap="ROUND" color="[COMPLICATION.TEXT]" thickness="3" />
-                    </Arc>
-                </PartDraw>
-                <!-- Artist name — stage color, large, hidden in ambient -->
+                <!-- Artist name — stage color (own-slot Font color confirmed working) -->
                 <PartText x="0" y="172" width="450" height="68">
                     <Variant mode="AMBIENT" target="alpha" value="0" />
                     <Text align="CENTER">
@@ -65,8 +45,7 @@
         </ComplicationSlot>
 
         <!-- ================================================================
-             SLOT 1 — countdown (SHORT_TEXT)
-               text = "37M LEFT" or "" when not at a stage
+             SLOT 1 — countdown (SHORT_TEXT): "37M LEFT" or ""
              ================================================================ -->
         <ComplicationSlot
             slotId="1"
@@ -93,8 +72,7 @@
         </ComplicationSlot>
 
         <!-- ================================================================
-             SLOT 2 — next artist (SHORT_TEXT)
-               text = "NEXT · Name" or ""
+             SLOT 2 — next artist (SHORT_TEXT): "NEXT · Name" or ""
              ================================================================ -->
         <ComplicationSlot
             slotId="2"
@@ -119,6 +97,37 @@
                 </PartText>
             </Complication>
         </ComplicationSlot>
+
+        <!-- ================================================================
+             ARC — rendered at Scene level so endAngle arithmetic expressions
+             work. Uses cross-slot [COMPLICATION_0.TEXT] for color (testing
+             whether Scene-level Stroke color attributes accept string
+             complication references).
+             ================================================================ -->
+
+        <!-- Arc track — full circle at 16% opacity -->
+        <PartDraw x="18" y="18" width="414" height="414" alpha="41">
+            <Variant mode="AMBIENT" target="alpha" value="0" />
+            <Arc direction="CLOCKWISE" startAngle="-90" endAngle="270">
+                <Stroke cap="ROUND" color="[COMPLICATION_0.TEXT]" thickness="13" />
+            </Arc>
+        </PartDraw>
+        <!-- Arc fill — progress sweep, full opacity -->
+        <PartDraw x="18" y="18" width="414" height="414">
+            <Variant mode="AMBIENT" target="alpha" value="0" />
+            <Arc direction="CLOCKWISE" startAngle="-90.0"
+                 endAngle="-90.0 + [COMPLICATION_0.RANGED_VALUE_CURRENT] * 3.6">
+                <Stroke cap="ROUND" color="[COMPLICATION_0.TEXT]" thickness="13" />
+            </Arc>
+        </PartDraw>
+        <!-- Arc fill — ambient, thin stroke at 30% opacity -->
+        <PartDraw x="18" y="18" width="414" height="414" alpha="0">
+            <Variant mode="AMBIENT" target="alpha" value="77" />
+            <Arc direction="CLOCKWISE" startAngle="-90.0"
+                 endAngle="-90.0 + [COMPLICATION_0.RANGED_VALUE_CURRENT] * 3.6">
+                <Stroke cap="ROUND" color="[COMPLICATION_0.TEXT]" thickness="3" />
+            </Arc>
+        </PartDraw>
 
         <!-- ================================================================
              CLOCK — active mode (hidden in ambient)

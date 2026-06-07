@@ -108,14 +108,16 @@
         <!-- Arc track — full circle at 16% opacity -->
         <PartDraw x="18" y="18" width="414" height="414" alpha="41">
             <Variant mode="AMBIENT" target="alpha" value="0" />
-            <Arc direction="CLOCKWISE" startAngle="-90" endAngle="270">
+            <Arc centerX="207" centerY="207" width="414" height="414"
+                 direction="CLOCKWISE" startAngle="-90" endAngle="270">
                 <Stroke cap="ROUND" color="[COMPLICATION_0.TEXT]" thickness="13" />
             </Arc>
         </PartDraw>
         <!-- Arc fill — progress sweep, full opacity -->
         <PartDraw x="18" y="18" width="414" height="414">
             <Variant mode="AMBIENT" target="alpha" value="0" />
-            <Arc direction="CLOCKWISE" startAngle="-90.0"
+            <Arc centerX="207" centerY="207" width="414" height="414"
+                 direction="CLOCKWISE" startAngle="-90.0"
                  endAngle="-90.0 + [COMPLICATION_0.RANGED_VALUE_CURRENT] * 3.6">
                 <Stroke cap="ROUND" color="[COMPLICATION_0.TEXT]" thickness="13" />
             </Arc>
@@ -123,7 +125,8 @@
         <!-- Arc fill — ambient, thin stroke at 30% opacity -->
         <PartDraw x="18" y="18" width="414" height="414" alpha="0">
             <Variant mode="AMBIENT" target="alpha" value="77" />
-            <Arc direction="CLOCKWISE" startAngle="-90.0"
+            <Arc centerX="207" centerY="207" width="414" height="414"
+                 direction="CLOCKWISE" startAngle="-90.0"
                  endAngle="-90.0 + [COMPLICATION_0.RANGED_VALUE_CURRENT] * 3.6">
                 <Stroke cap="ROUND" color="[COMPLICATION_0.TEXT]" thickness="3" />
             </Arc>

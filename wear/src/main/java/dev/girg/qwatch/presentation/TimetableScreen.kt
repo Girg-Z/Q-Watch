@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.Text
@@ -33,76 +34,62 @@ fun TimetableScreen(
 ) {
     val stage = remember(stageId) { FESTIVAL_STAGES.find { it.id == stageId } }
     val stageColor = stage?.color ?: Color(0xFF808080)
-    val locationName = stage?.timetableLocation ?: ""
 
     val info = remember(stageId) {
-        if (locationName.isNotBlank()) timetableRepo.getNowAndNext(locationName, ZonedDateTime.now())
-        else NowAndNext(null, null, null, 0, 0, null, null)
+        stage?.let { timetableRepo.getNowAndNext(it.timetableLocation, ZonedDateTime.now()) }
     }
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-            .padding(top = 76.dp, start = 44.dp, end = 44.dp, bottom = 64.dp)
+            .padding(horizontal = 20.dp, vertical = 20.dp)
     ) {
-        Column {
-            // Header: stage name + TIMETABLE label
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Bottom
-            ) {
-                Text(
-                    text = stage?.displayName ?: "—",
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 28.sp,
-                    color = stageColor,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    text = "TIMETABLE",
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 10.sp,
-                    color = Color(0xFF7A7A7A),
-                    letterSpacing = 0.18.sp
-                )
-            }
+        // Header: stage name + TIMETABLE label
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Text(
+                text = stage?.displayName ?: "—",
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 24.sp,
+                color = stageColor,
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = "TIMETABLE",
+                fontFamily = FontFamily.Monospace,
+                fontSize = 9.sp,
+                color = Color(0xFF7A7A7A),
+                letterSpacing = 0.15.sp
+            )
+        }
 
-            Spacer(Modifier.height(22.dp))
+        Spacer(Modifier.height(10.dp))
 
-            if (info.nowArtist != null) {
-                TimetableSlot(
-                    active = true,
-                    time = info.nowStart ?: "",
-                    artist = info.nowArtist,
-                    label = "NOW PLAYING",
-                    stageColor = stageColor,
-                    progress = info.nowProgress / 100f,
-                    endsInMins = info.nowMinsLeft
-                )
-            } else {
-                TimetableSlot(
-                    active = false,
-                    time = "—",
-                    artist = "Nothing playing",
-                    label = "NOW PLAYING",
-                    stageColor = stageColor,
-                    progress = 0f,
-                    endsInMins = 0
-                )
-            }
+        TimetableSlot(
+            active = true,
+            time = info?.nowStart ?: "—",
+            artist = info?.nowArtist ?: "—",
+            label = "NOW PLAYING",
+            stageColor = stageColor,
+            progress = (info?.nowProgress ?: 0) / 100f,
+            endsInMins = info?.nowMinsLeft ?: 0
+        )
 
-            if (info.nextArtist != null) {
-                TimetableSlot(
-                    active = false,
-                    time = info.nextStart ?: info.nowEnd ?: "",
-                    artist = info.nextArtist,
-                    label = "UP NEXT",
-                    stageColor = stageColor,
-                    progress = 0f,
-                    endsInMins = 0
-                )
-            }
+        if (!info?.nextArtist.isNullOrBlank()) {
+            TimetableSlot(
+                active = false,
+                time = info?.nextStart ?: "—",
+                artist = info!!.nextArtist!!,
+                label = "UP NEXT",
+                stageColor = stageColor,
+                progress = 0f,
+                endsInMins = 0
+            )
         }
     }
 }
@@ -120,50 +107,49 @@ private fun TimetableSlot(
     val ink = if (active) stageColor else Color(0xFF6F6F6F)
     val dotColor = if (active) stageColor else Color(0xFF3A3A3A)
     val artistColor = if (active) Color.White else Color(0xFF9A9A9A)
-    val artistSize = if (artist.length > 14) 22.sp else 28.sp
+    val artistSize = if (artist.length > 14) 20.sp else 24.sp
 
-    Row(verticalAlignment = Alignment.Top) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+        verticalAlignment = Alignment.Top
+    ) {
         // Time label
         Text(
             text = time,
             fontFamily = FontFamily.Monospace,
-            fontSize = 12.sp,
+            fontSize = 11.sp,
             color = ink,
             textAlign = TextAlign.End,
             modifier = Modifier
-                .width(52.dp)
-                .padding(top = 4.dp)
+                .width(44.dp)
+                .padding(top = 3.dp)
         )
 
-        Spacer(Modifier.width(14.dp))
+        Spacer(Modifier.width(10.dp))
 
         // Timeline dot
         Box(
-            modifier = Modifier.width(16.dp),
+            modifier = Modifier.width(12.dp),
             contentAlignment = Alignment.TopCenter
         ) {
             Box(
                 modifier = Modifier
-                    .padding(top = 6.dp)
-                    .size(11.dp)
+                    .padding(top = 4.dp)
+                    .size(9.dp)
                     .background(dotColor, CircleShape)
             )
         }
 
-        Spacer(Modifier.width(10.dp))
+        Spacer(Modifier.width(8.dp))
 
-        // Text + progress
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(bottom = 18.dp)
-        ) {
+        // Content column
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = label,
                 fontFamily = FontFamily.Monospace,
-                fontSize = 9.sp,
+                fontSize = 8.sp,
                 color = ink,
-                letterSpacing = 0.18.sp
+                letterSpacing = 0.12.sp
             )
             Text(
                 text = artist,
@@ -171,33 +157,32 @@ private fun TimetableSlot(
                 fontSize = artistSize,
                 color = artistColor,
                 lineHeight = artistSize,
-                modifier = Modifier.padding(top = 2.dp)
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 1.dp)
             )
 
             if (active) {
-                Spacer(Modifier.height(10.dp))
-                // Progress bar
+                Spacer(Modifier.height(6.dp))
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(end = 6.dp)
-                        .height(5.dp)
-                        .background(Color(0xFF1C1C1C), RoundedCornerShape(3.dp))
+                        .height(4.dp)
+                        .background(Color(0xFF1C1C1C), RoundedCornerShape(2.dp))
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(fraction = progress.coerceIn(0f, 1f))
-                            .height(5.dp)
-                            .background(stageColor, RoundedCornerShape(3.dp))
+                            .height(4.dp)
+                            .background(stageColor, RoundedCornerShape(2.dp))
                     )
                 }
-                Spacer(Modifier.height(5.dp))
+                Spacer(Modifier.height(4.dp))
                 Text(
                     text = if (endsInMins > 0) "ENDS IN ${endsInMins}M" else "ENDING",
                     fontFamily = FontFamily.Monospace,
-                    fontSize = 10.sp,
-                    color = Color(0xFF8A8A8A),
-                    letterSpacing = 0.04.sp
+                    fontSize = 9.sp,
+                    color = Color(0xFF8A8A8A)
                 )
             }
         }

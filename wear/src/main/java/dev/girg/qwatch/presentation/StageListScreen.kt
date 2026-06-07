@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -65,8 +66,14 @@ fun StageListScreen(
     }
 
     LaunchedEffect(selectedIndex) {
-        if (selectedIndex != null) {
-            listState.animateScrollToItem((selectedIndex - 2).coerceAtLeast(0))
+        if (selectedIndex == null) return@LaunchedEffect
+        // Instant scroll to bring selected item near view, then fine-adjust to centre — no animation, no overshoot
+        listState.scrollToItem((selectedIndex - 1).coerceAtLeast(0))
+        val itemInfo = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == selectedIndex }
+        if (itemInfo != null) {
+            val viewportCenter = (listState.layoutInfo.viewportStartOffset + listState.layoutInfo.viewportEndOffset) / 2
+            val itemCenter = itemInfo.offset + itemInfo.size / 2
+            listState.scrollBy((itemCenter - viewportCenter).toFloat())
         }
     }
 
@@ -77,7 +84,7 @@ fun StageListScreen(
     ) {
         LazyColumn(
             state = listState,
-            contentPadding = PaddingValues(top = 96.dp, start = 36.dp, end = 36.dp, bottom = 96.dp)
+            contentPadding = PaddingValues(top = 48.dp, start = 36.dp, end = 36.dp, bottom = 96.dp)
         ) {
             items(FESTIVAL_STAGES) { stage ->
                 val selected = stage.id == selectedStageId
@@ -143,7 +150,7 @@ fun StageListScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(96.dp)
+                .height(48.dp)
                 .background(
                     Brush.verticalGradient(
                         colorStops = arrayOf(

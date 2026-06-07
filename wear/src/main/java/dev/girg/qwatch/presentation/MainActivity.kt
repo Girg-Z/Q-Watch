@@ -27,9 +27,9 @@ import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import androidx.wear.compose.material3.lazy.transformedHeight
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
-import dev.girg.qwatch.complication.StageComplicationService
-import dev.girg.qwatch.complication.NowPlayingComplicationService
 import dev.girg.qwatch.complication.NextArtistComplicationService
+import dev.girg.qwatch.complication.NowPlayingComplicationService
+import dev.girg.qwatch.complication.StageComplicationService
 import dev.girg.qwatch.data.StageState
 import dev.girg.qwatch.data.readStageStateFlow
 import dev.girg.qwatch.data.writeStageState
@@ -81,15 +81,15 @@ fun DebugScreen(context: Context) {
         scope.launch {
             context.writeStageState(newState)
             Log.d("MainActivity", "Debug state written: $newState")
-            ComplicationDataSourceUpdateRequester
-                .create(context, ComponentName(context, StageComplicationService::class.java))
-                .requestUpdateAll()
-            ComplicationDataSourceUpdateRequester
-                .create(context, ComponentName(context, NowPlayingComplicationService::class.java))
-                .requestUpdateAll()
-            ComplicationDataSourceUpdateRequester
-                .create(context, ComponentName(context, NextArtistComplicationService::class.java))
-                .requestUpdateAll()
+            listOf(
+                StageComplicationService::class.java,
+                NowPlayingComplicationService::class.java,
+                NextArtistComplicationService::class.java
+            ).forEach { serviceClass ->
+                ComplicationDataSourceUpdateRequester
+                    .create(context, ComponentName(context, serviceClass))
+                    .requestUpdateAll()
+            }
         }
     }
 
@@ -109,6 +109,9 @@ fun DebugScreen(context: Context) {
                         text = buildString {
                             appendLine("Stage: ${state.stageId ?: "—"}")
                             appendLine("Artist: ${state.artistName ?: "none"}")
+                            appendLine("Next: ${state.nextArtistName ?: "none"}")
+                            appendLine("Progress: ${state.setProgressPercent}%")
+                            appendLine("Mins left: ${state.minsToSetEnd}")
                             appendLine("GPS: ${if (state.isGpsAvailable) "yes" else "no"}")
                             appendLine("Festival: ${if (state.isFestivalActive) "yes" else "no"}")
                             append("Updated: ${if (state.lastUpdateMillis > 0) timeFormat.format(Date(state.lastUpdateMillis)) else "—"}")
@@ -128,7 +131,8 @@ fun DebugScreen(context: Context) {
                     "blue" to "BLUE", "indigo" to "INDIGO", "black" to "BLACK",
                     "magenta" to "MAGENTA", "yellow" to "YELLOW", "purple" to "PURPLE",
                     "uv" to "UV", "gold" to "GOLD", "brown" to "BROWN",
-                    "red" to "RED", "orange_light_district" to "ORANGE"
+                    "red" to "RED", "orange_light_district" to "ORANGE",
+                    "green" to "GREEN", "silver" to "SILVER", "pink" to "PINK"
                 )
                 stageIds.forEach { (id, displayName) ->
                     item {
@@ -140,7 +144,10 @@ fun DebugScreen(context: Context) {
                                     artistName = "Test Artist",
                                     isGpsAvailable = true,
                                     isFestivalActive = true,
-                                    lastUpdateMillis = System.currentTimeMillis()
+                                    lastUpdateMillis = System.currentTimeMillis(),
+                                    setProgressPercent = 60,
+                                    minsToSetEnd = 37,
+                                    nextArtistName = "Headhunterz"
                                 ))
                             },
                             modifier = Modifier.fillMaxWidth().transformedHeight(this, transformSpec),
@@ -152,7 +159,11 @@ fun DebugScreen(context: Context) {
                 item {
                     Button(
                         onClick = {
-                            writeDebugState(StageState(isFestivalActive = true, isGpsAvailable = true, lastUpdateMillis = System.currentTimeMillis()))
+                            writeDebugState(StageState(
+                                isFestivalActive = true,
+                                isGpsAvailable = true,
+                                lastUpdateMillis = System.currentTimeMillis()
+                            ))
                         },
                         modifier = Modifier.fillMaxWidth().transformedHeight(this, transformSpec),
                         transformation = SurfaceTransformation(transformSpec)
@@ -162,7 +173,10 @@ fun DebugScreen(context: Context) {
                 item {
                     Button(
                         onClick = {
-                            writeDebugState(StageState(isGpsAvailable = false, lastUpdateMillis = System.currentTimeMillis()))
+                            writeDebugState(StageState(
+                                isGpsAvailable = false,
+                                lastUpdateMillis = System.currentTimeMillis()
+                            ))
                         },
                         modifier = Modifier.fillMaxWidth().transformedHeight(this, transformSpec),
                         transformation = SurfaceTransformation(transformSpec)

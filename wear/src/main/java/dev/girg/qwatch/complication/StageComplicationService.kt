@@ -19,10 +19,9 @@ class StageComplicationService : SuspendingComplicationDataSourceService() {
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
         val state = applicationContext.readStageStateFlow().first()
         val text = when {
-            !state.isFestivalActive -> "between"
-            !state.isGpsAvailable  -> "gps_error"
-            state.stageId == null  -> "between"
-            else                   -> state.stageId
+            !state.isGpsAvailable -> "gps_error"
+            !state.isFestivalActive || state.stageId == null -> ""
+            else -> state.stageId
         }
         return makeData(text)
     }
@@ -30,6 +29,6 @@ class StageComplicationService : SuspendingComplicationDataSourceService() {
     private fun makeData(text: String) =
         ShortTextComplicationData.Builder(
             text = PlainComplicationText.Builder(text).build(),
-            contentDescription = PlainComplicationText.Builder(text).build()
+            contentDescription = PlainComplicationText.Builder("Stage").build()
         ).build()
 }

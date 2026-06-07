@@ -41,6 +41,36 @@
                         </Font>
                     </Text>
                 </PartText>
+                <!-- Arc track — full circle at 16% opacity -->
+                <PartDraw x="18" y="18" width="414" height="414" alpha="41">
+                    <Variant mode="AMBIENT" target="alpha" value="0" />
+                    <Arc centerX="207" centerY="207" width="414" height="414"
+                        direction="CLOCKWISE" startAngle="0" endAngle="360">
+                        <Stroke cap="ROUND" color="[COMPLICATION.TEXT]" thickness="13" />
+                    </Arc>
+                </PartDraw>
+                <!-- Arc fill — progress sweep, full opacity -->
+                <PartDraw x="18" y="18" width="414" height="414">
+                    <Variant mode="AMBIENT" target="alpha" value="0" />
+                    <Arc centerX="207" centerY="207" width="414" height="414"
+                        direction="CLOCKWISE" startAngle="0.0" endAngle="0.0">
+                        <Stroke cap="ROUND" color="[COMPLICATION.TEXT]" thickness="13" />
+                        <Transform
+                            target="endAngle"
+                            value="[COMPLICATION.RANGED_VALUE_VALUE] * 3.6" />
+                    </Arc>
+                </PartDraw>
+                <!-- Arc fill — ambient, thin stroke at 30% opacity -->
+                <PartDraw x="18" y="18" width="414" height="414" alpha="0">
+                    <Variant mode="AMBIENT" target="alpha" value="77" />
+                    <Arc centerX="207" centerY="207" width="414" height="414"
+                        direction="CLOCKWISE" startAngle="0.0" endAngle="0.0">
+                        <Stroke cap="ROUND" color="[COMPLICATION.TEXT]" thickness="3" />
+                        <Transform
+                            target="endAngle"
+                            value="[COMPLICATION.RANGED_VALUE_VALUE] * 3.6" />
+                    </Arc>
+                </PartDraw>
             </Complication>
         </ComplicationSlot>
 
@@ -63,7 +93,7 @@
                 <PartText x="0" y="303" width="450" height="20">
                     <Variant mode="AMBIENT" target="alpha" value="0" />
                     <Text align="CENTER">
-                        <Font family="SYNC_TO_DEVICE" size="12" color="#6F6F6F">
+                        <Font family="SYNC_TO_DEVICE" size="13" color="#B4B4B4">
                             <Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template>
                         </Font>
                     </Text>
@@ -87,10 +117,10 @@
                 primaryProvider="dev.girg.qwatch/dev.girg.qwatch.complication.NextArtistComplicationService"
                 primaryProviderType="SHORT_TEXT" />
             <Complication type="SHORT_TEXT">
-                <PartText x="0" y="325" width="450" height="20">
+                <PartText x="0" y="330" width="450" height="20">
                     <Variant mode="AMBIENT" target="alpha" value="0" />
                     <Text align="CENTER">
-                        <Font family="SYNC_TO_DEVICE" size="12" color="#6F6F6F">
+                        <Font family="SYNC_TO_DEVICE" size="14" color="#B4B4B4">
                             <Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template>
                         </Font>
                     </Text>
@@ -99,47 +129,13 @@
         </ComplicationSlot>
 
         <!-- ================================================================
-             ARC — rendered at Scene level so endAngle arithmetic expressions
-             work. Uses cross-slot [COMPLICATION_0.TEXT] for color (testing
-             whether Scene-level Stroke color attributes accept string
-             complication references).
-             ================================================================ -->
-
-        <!-- Arc track — full circle at 16% opacity -->
-        <PartDraw x="18" y="18" width="414" height="414" alpha="41">
-            <Variant mode="AMBIENT" target="alpha" value="0" />
-            <Arc centerX="207" centerY="207" width="414" height="414"
-                 direction="CLOCKWISE" startAngle="-90" endAngle="270">
-                <Stroke cap="ROUND" color="[COMPLICATION_0.TEXT]" thickness="13" />
-            </Arc>
-        </PartDraw>
-        <!-- Arc fill — progress sweep, full opacity -->
-        <PartDraw x="18" y="18" width="414" height="414">
-            <Variant mode="AMBIENT" target="alpha" value="0" />
-            <Arc centerX="207" centerY="207" width="414" height="414"
-                 direction="CLOCKWISE" startAngle="-90.0"
-                 endAngle="-90.0 + [COMPLICATION_0.RANGED_VALUE_CURRENT] * 3.6">
-                <Stroke cap="ROUND" color="[COMPLICATION_0.TEXT]" thickness="13" />
-            </Arc>
-        </PartDraw>
-        <!-- Arc fill — ambient, thin stroke at 30% opacity -->
-        <PartDraw x="18" y="18" width="414" height="414" alpha="0">
-            <Variant mode="AMBIENT" target="alpha" value="77" />
-            <Arc centerX="207" centerY="207" width="414" height="414"
-                 direction="CLOCKWISE" startAngle="-90.0"
-                 endAngle="-90.0 + [COMPLICATION_0.RANGED_VALUE_CURRENT] * 3.6">
-                <Stroke cap="ROUND" color="[COMPLICATION_0.TEXT]" thickness="3" />
-            </Arc>
-        </PartDraw>
-
-        <!-- ================================================================
              CLOCK — active mode (hidden in ambient)
              ================================================================ -->
         <DigitalClock x="0" y="252" width="450" height="48">
             <TimeText format="hh:mm" hourFormat="24" align="CENTER"
                       x="0" y="0" width="450" height="48">
                 <Variant mode="AMBIENT" target="alpha" value="0" />
-                <Font family="SYNC_TO_DEVICE" size="36" color="#DCDCDC" />
+                <Font family="SYNC_TO_DEVICE" size="36" color="#E6E6E6" />
             </TimeText>
         </DigitalClock>
 
@@ -151,6 +147,5 @@
                 <Font family="SYNC_TO_DEVICE" size="80" color="#FFFFFF" weight="THIN" />
             </TimeText>
         </DigitalClock>
-
     </Scene>
 </WatchFace>

@@ -27,7 +27,9 @@ import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import androidx.wear.compose.material3.lazy.transformedHeight
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
-import dev.girg.qwatch.complication.MainComplicationService
+import dev.girg.qwatch.complication.StageComplicationService
+import dev.girg.qwatch.complication.NowPlayingComplicationService
+import dev.girg.qwatch.complication.NextArtistComplicationService
 import dev.girg.qwatch.data.StageState
 import dev.girg.qwatch.data.readStageStateFlow
 import dev.girg.qwatch.data.writeStageState
@@ -80,7 +82,13 @@ fun DebugScreen(context: Context) {
             context.writeStageState(newState)
             Log.d("MainActivity", "Debug state written: $newState")
             ComplicationDataSourceUpdateRequester
-                .create(context, ComponentName(context, MainComplicationService::class.java))
+                .create(context, ComponentName(context, StageComplicationService::class.java))
+                .requestUpdateAll()
+            ComplicationDataSourceUpdateRequester
+                .create(context, ComponentName(context, NowPlayingComplicationService::class.java))
+                .requestUpdateAll()
+            ComplicationDataSourceUpdateRequester
+                .create(context, ComponentName(context, NextArtistComplicationService::class.java))
                 .requestUpdateAll()
         }
     }

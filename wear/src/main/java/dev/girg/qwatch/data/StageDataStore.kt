@@ -21,6 +21,10 @@ suspend fun Context.writeStageState(state: StageState) {
         prefs[StageStateKeys.IS_GPS_AVAILABLE] = state.isGpsAvailable
         prefs[StageStateKeys.IS_FESTIVAL_ACTIVE] = state.isFestivalActive
         prefs[StageStateKeys.LAST_UPDATE_MILLIS] = state.lastUpdateMillis
+        prefs[StageStateKeys.SET_PROGRESS_PERCENT] = state.setProgressPercent
+        prefs[StageStateKeys.MINS_TO_SET_END] = state.minsToSetEnd
+        state.nextArtistName?.let { prefs[StageStateKeys.NEXT_ARTIST_NAME] = it }
+            ?: prefs.remove(StageStateKeys.NEXT_ARTIST_NAME)
     }
 }
 
@@ -31,6 +35,9 @@ fun Context.readStageStateFlow(): Flow<StageState> = stageDataStore.data.map { p
         artistName = prefs[StageStateKeys.ARTIST_NAME],
         isGpsAvailable = prefs[StageStateKeys.IS_GPS_AVAILABLE] ?: false,
         isFestivalActive = prefs[StageStateKeys.IS_FESTIVAL_ACTIVE] ?: false,
-        lastUpdateMillis = prefs[StageStateKeys.LAST_UPDATE_MILLIS] ?: 0L
+        lastUpdateMillis = prefs[StageStateKeys.LAST_UPDATE_MILLIS] ?: 0L,
+        setProgressPercent = prefs[StageStateKeys.SET_PROGRESS_PERCENT] ?: 0,
+        minsToSetEnd = prefs[StageStateKeys.MINS_TO_SET_END] ?: 0,
+        nextArtistName = prefs[StageStateKeys.NEXT_ARTIST_NAME]
     )
 }

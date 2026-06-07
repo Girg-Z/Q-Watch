@@ -13,14 +13,14 @@ class NowPlayingComplicationService : SuspendingComplicationDataSourceService() 
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
         if (type != ComplicationType.RANGED_VALUE) return null
-        return makeData("Sub Zero Project", "37", 60f)
+        return makeData("Sub Zero Project", "37M LEFT", 60f)
     }
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
         val state = applicationContext.readStageStateFlow().first()
         return makeData(
             text  = state.artistName ?: "",
-            title = state.minsToSetEnd.toString(),
+            title = if (state.minsToSetEnd > 0) "${state.minsToSetEnd}M LEFT" else "",
             value = state.setProgressPercent.toFloat()
         )
     }

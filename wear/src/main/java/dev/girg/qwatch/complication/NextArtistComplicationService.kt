@@ -13,12 +13,14 @@ class NextArtistComplicationService : SuspendingComplicationDataSourceService() 
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
         if (type != ComplicationType.SHORT_TEXT) return null
-        return makeData("Headhunterz")
+        return makeData("NEXT · Headhunterz")
     }
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
         val state = applicationContext.readStageStateFlow().first()
-        return makeData(state.nextArtistName ?: "")
+        return makeData(
+            if (state.nextArtistName != null) "NEXT · ${state.nextArtistName}" else ""
+        )
     }
 
     private fun makeData(text: String) =

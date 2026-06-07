@@ -3,6 +3,7 @@ package dev.girg.qwatch.presentation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -24,78 +27,65 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.wear.compose.material3.Text
-import androidx.wear.tooling.preview.devices.WearDevices
-import java.time.ZonedDateTime
 
 @Composable
 fun TimetableScreen(
-    stageId: String?,
+    stageId: String,
     timetableRepo: TimetableRepository
 ) {
     val stage = remember(stageId) { FESTIVAL_STAGES.find { it.id == stageId } }
-    val info = remember(stageId) {
-        stage?.let { timetableRepo.getNowAndNext(it.timetableLocation, ZonedDateTime.now()) }
+    val entries = remember(stageId) {
+        stage?.let { timetableRepo.getUpcomingEntries(it.timetableLocation) } ?: emptyList()
     }
-    TimetableScreenContent(
-        stageName = stage?.displayName,
-        stageColor = stage?.color ?: Color(0xFF808080),
-        info = info
-    )
-}
+    val stageColor = stage?.color ?: Color(0xFF808080)
 
-@Composable
-private fun TimetableScreenContent(
-    stageName: String?,
-    stageColor: Color,
-    info: NowAndNext?
-) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-            .padding(horizontal = 20.dp, vertical = 20.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Bottom
+        LazyColumn(
+            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 20.dp)
         ) {
-            Text(
-                text = stageName ?: "—",
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 18.sp,
-                color = stageColor,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
+            item {
+                Text(
+                    text = stage?.displayName ?: "—",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 18.sp,
+                    color = stageColor,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
 
-        Spacer(Modifier.height(10.dp))
-
-        TimetableSlot(
-            active = true,
-            time = info?.nowStart ?: "—",
-            artist = info?.nowArtist ?: "—",
-            label = "NOW PLAYING",
-            stageColor = stageColor,
-            progress = (info?.nowProgress ?: 0) / 100f,
-            endsInMins = info?.nowMinsLeft ?: 0
-        )
-
-        val nextArtist = info?.nextArtist
-        if (!nextArtist.isNullOrBlank()) {
-            TimetableSlot(
-                active = false,
-                time = info?.nextStart ?: "—",
-                artist = nextArtist,
-                label = "UP NEXT",
-                stageColor = stageColor,
-                progress = 0f,
-                endsInMins = 0
-            )
+            if (entries.isEmpty()) {
+                item {
+                    TimetableSlot(
+                        active = false,
+                        time = "—",
+                        artist = "—",
+                        label = "",
+                        stageColor = stageColor,
+                        progress = 0f,
+                        endsInMins = 0
+                    )
+                }
+            } else {
+                items(entries) { entry ->
+                    TimetableSlot(
+                        active = entry.isNow,
+                        time = entry.startTime,
+                        artist = entry.artist,
+                        label = if (entry.isNow) "NOW PLAYING" else "",
+                        stageColor = stageColor,
+                        progress = entry.progress / 100f,
+                        endsInMins = entry.minsLeft
+                    )
+                }
+            }
         }
     }
 }
@@ -150,13 +140,15 @@ private fun TimetableSlot(
 
         // Content column
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = label,
-                fontFamily = FontFamily.Monospace,
-                fontSize = 8.sp,
-                color = ink,
-                letterSpacing = 0.12.sp
-            )
+            if (label.isNotEmpty()) {
+                Text(
+                    text = label,
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 8.sp,
+                    color = ink,
+                    letterSpacing = 0.12.sp
+                )
+            }
             Text(
                 text = artist,
                 fontWeight = FontWeight.Bold,
@@ -193,22 +185,4 @@ private fun TimetableSlot(
             }
         }
     }
-}
-
-@Preview(device = WearDevices.SMALL_ROUND, showSystemUi = true)
-@Composable
-private fun TimetableScreenPreview() {
-    TimetableScreenContent(
-        stageName = "BLUE",
-        stageColor = Color(0xFF0BDBEF),
-        info = NowAndNext(
-            nowArtist = "Headhunterz",
-            nowStart = "21:00",
-            nowEnd = "22:00",
-            nowProgress = 60,
-            nowMinsLeft = 24,
-            nextArtist = "Noisecontrollers",
-            nextStart = "22:00"
-        )
-    )
 }

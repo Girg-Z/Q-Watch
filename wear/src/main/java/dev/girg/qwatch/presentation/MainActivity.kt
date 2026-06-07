@@ -10,12 +10,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.wear.compose.foundation.pager.HorizontalPager
-import androidx.wear.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,7 +18,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -31,7 +25,6 @@ import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.AppScaffold
 import androidx.wear.compose.material3.Button
-import androidx.wear.compose.material3.HorizontalPageIndicator
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.SurfaceTransformation
@@ -52,7 +45,11 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private enum class Screen { MAIN, DEBUG }
+private sealed class Screen {
+    object Main : Screen()
+    object Debug : Screen()
+    data class Timetable(val stageId: String) : Screen()
+}
 
 class MainActivity : ComponentActivity() {
 
@@ -89,42 +86,25 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun AppContent(context: Context, timetableRepo: TimetableRepository) {
     val stageState by context.readStageStateFlow().collectAsState(initial = StageState())
-    var screen by remember { mutableStateOf(Screen.MAIN) }
+    var screen by remember { mutableStateOf<Screen>(Screen.Main) }
 
-    BackHandler(enabled = screen == Screen.DEBUG) {
-        screen = Screen.MAIN
+    BackHandler(enabled = screen != Screen.Main) {
+        screen = Screen.Main
     }
 
-    when (screen) {
-        Screen.DEBUG -> DebugScreen(context = context)
-        Screen.MAIN -> {
-            val pagerState = rememberPagerState(pageCount = { 2 })
-            AppScaffold {
-                Box(Modifier.fillMaxSize()) {
-                    HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
-                        when (page) {
-                            0 -> StageListScreen(
-                                context = context,
-                                selectedStageId = stageState.stageId,
-                                timetableRepo = timetableRepo,
-                                onNavigateToDebug = { screen = Screen.DEBUG }
-                            )
-                            else -> TimetableScreen(
-                                stageId = stageState.stageId,
-                                timetableRepo = timetableRepo
-                            )
-                        }
-                    }
-
-                    HorizontalPageIndicator(
-                        pagerState = pagerState,
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = 4.dp)
-                    )
-                }
-            }
-        }
+    when (val s = screen) {
+        Screen.Debug -> DebugScreen(context = context)
+        Screen.Main -> StageListScreen(
+            context = context,
+            selectedStageId = stageState.stageId,
+            timetableRepo = timetableRepo,
+            onStageSelected = { stageId -> screen = Screen.Timetable(stageId) },
+            onNavigateToDebug = { screen = Screen.Debug }
+        )
+        is Screen.Timetable -> TimetableScreen(
+            stageId = s.stageId,
+            timetableRepo = timetableRepo
+        )
     }
 }
 

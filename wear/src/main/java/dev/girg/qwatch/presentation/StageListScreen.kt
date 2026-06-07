@@ -1,6 +1,5 @@
 package dev.girg.qwatch.presentation
 
-import android.content.ComponentName
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,7 +22,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,13 +33,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.Text
-import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
-import dev.girg.qwatch.complication.NextArtistComplicationService
-import dev.girg.qwatch.complication.NowPlayingComplicationService
-import dev.girg.qwatch.complication.StageComplicationService
-import dev.girg.qwatch.data.StageState
-import dev.girg.qwatch.data.writeStageState
-import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
 
 @Composable
@@ -49,20 +40,23 @@ fun StageListScreen(
     context: Context,
     selectedStageId: String?,
     timetableRepo: TimetableRepository,
+    onStageSelected: (stageId: String) -> Unit,
     onNavigateToDebug: () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 
     val now = remember { ZonedDateTime.now() }
+    val visibleStages = remember(now) {
+        FESTIVAL_STAGES.filter { timetableRepo.hasEventsToday(it.timetableLocation, now) }
+    }
     val currentArtists = remember(now) {
-        FESTIVAL_STAGES.associate { stage ->
+        visibleStages.associate { stage ->
             stage.id to timetableRepo.getCurrentArtist(stage.timetableLocation, now)
         }
     }
 
     val selectedIndex = remember(selectedStageId) {
-        FESTIVAL_STAGES.indexOfFirst { it.id == selectedStageId }.takeIf { it >= 0 }
+        visibleStages.indexOfFirst { it.id == selectedStageId }.takeIf { it >= 0 }
     }
 
     LaunchedEffect(selectedIndex) {
@@ -86,40 +80,14 @@ fun StageListScreen(
             state = listState,
             contentPadding = PaddingValues(top = 48.dp, start = 36.dp, end = 36.dp, bottom = 96.dp)
         ) {
-            items(FESTIVAL_STAGES) { stage ->
+            items(visibleStages) { stage ->
                 val selected = stage.id == selectedStageId
                 val artist = currentArtists[stage.id]
                 StageRow(
                     stage = stage,
                     artist = artist,
                     selected = selected,
-                    onClick = {
-                        scope.launch {
-                            val nowAndNext = timetableRepo.getNowAndNext(stage.timetableLocation)
-                            context.writeStageState(
-                                StageState(
-                                    stageId = stage.id,
-                                    stageName = stage.displayName,
-                                    artistName = nowAndNext.nowArtist,
-                                    nextArtistName = nowAndNext.nextArtist,
-                                    setProgressPercent = nowAndNext.nowProgress,
-                                    minsToSetEnd = nowAndNext.nowMinsLeft,
-                                    isFestivalActive = true,
-                                    isGpsAvailable = true,
-                                    lastUpdateMillis = System.currentTimeMillis()
-                                )
-                            )
-                            listOf(
-                                StageComplicationService::class.java,
-                                NowPlayingComplicationService::class.java,
-                                NextArtistComplicationService::class.java
-                            ).forEach { svc ->
-                                ComplicationDataSourceUpdateRequester
-                                    .create(context, ComponentName(context, svc))
-                                    .requestUpdateAll()
-                            }
-                        }
-                    }
+                    onClick = { onStageSelected(stage.id) }
                 )
                 Spacer(Modifier.height(4.dp))
             }

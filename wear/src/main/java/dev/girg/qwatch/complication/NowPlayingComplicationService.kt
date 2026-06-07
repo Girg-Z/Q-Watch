@@ -41,6 +41,7 @@ class NowPlayingComplicationService : SuspendingComplicationDataSourceService() 
         "green"                 -> "#00FF00"
         "yellow"                -> "#F1E300"
         "gold"                  -> "#BB9551"
+        "orange"                -> "#FF6500"
         "orange_light_district" -> "#FF6500"
         "purple"                -> "#A100FF"
         "silver"                -> "#DADADA"

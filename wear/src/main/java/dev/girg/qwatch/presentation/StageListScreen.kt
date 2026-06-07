@@ -21,11 +21,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,11 +40,8 @@ import dev.girg.qwatch.complication.NowPlayingComplicationService
 import dev.girg.qwatch.complication.StageComplicationService
 import dev.girg.qwatch.data.StageState
 import dev.girg.qwatch.data.writeStageState
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.time.LocalTime
 import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun StageListScreen(
@@ -58,15 +52,6 @@ fun StageListScreen(
 ) {
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
-
-    var clockText by remember { mutableStateOf("") }
-    LaunchedEffect(Unit) {
-        val fmt = DateTimeFormatter.ofPattern("HH:mm")
-        while (true) {
-            clockText = LocalTime.now().format(fmt)
-            delay(10_000L)
-        }
-    }
 
     val now = remember { ZonedDateTime.now() }
     val currentArtists = remember(now) {
@@ -80,8 +65,8 @@ fun StageListScreen(
     }
 
     LaunchedEffect(selectedIndex) {
-        if (selectedIndex != null && selectedIndex > 0) {
-            listState.animateScrollToItem((selectedIndex - 1).coerceAtLeast(0))
+        if (selectedIndex != null) {
+            listState.animateScrollToItem((selectedIndex - 2).coerceAtLeast(0))
         }
     }
 
@@ -170,25 +155,14 @@ fun StageListScreen(
                 ),
             contentAlignment = Alignment.BottomCenter
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+            Text(
+                text = "STAGES",
+                fontFamily = FontFamily.Monospace,
+                fontSize = 11.sp,
+                color = Color(0xFF7A7A7A),
+                letterSpacing = 0.24.sp,
                 modifier = Modifier.padding(bottom = 8.dp)
-            ) {
-                Text(
-                    text = "STAGES",
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 11.sp,
-                    color = Color(0xFF7A7A7A),
-                    letterSpacing = 0.24.sp
-                )
-                Text(
-                    text = clockText,
-                    fontFamily = FontFamily.SansSerif,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 24.sp,
-                    color = Color(0xFFCFCFCF)
-                )
-            }
+            )
         }
 
         // Bottom gradient

@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)
+    testImplementation(libs.junit)
     debugImplementation(libs.tiles.renderer)
     debugImplementation(libs.tiles.tooling)
     debugImplementation(libs.ui.test.manifest)

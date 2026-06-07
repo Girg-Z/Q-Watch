@@ -24,7 +24,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.wear.compose.material3.Text
+import androidx.wear.tooling.preview.devices.WearDevices
 import java.time.ZonedDateTime
 
 @Composable
@@ -33,38 +35,41 @@ fun TimetableScreen(
     timetableRepo: TimetableRepository
 ) {
     val stage = remember(stageId) { FESTIVAL_STAGES.find { it.id == stageId } }
-    val stageColor = stage?.color ?: Color(0xFF808080)
-
     val info = remember(stageId) {
         stage?.let { timetableRepo.getNowAndNext(it.timetableLocation, ZonedDateTime.now()) }
     }
+    TimetableScreenContent(
+        stageName = stage?.displayName,
+        stageColor = stage?.color ?: Color(0xFF808080),
+        info = info
+    )
+}
 
+@Composable
+private fun TimetableScreenContent(
+    stageName: String?,
+    stageColor: Color,
+    info: NowAndNext?
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
             .padding(horizontal = 20.dp, vertical = 20.dp)
     ) {
-        // Header: stage name + TIMETABLE label
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.Bottom
         ) {
             Text(
-                text = stage?.displayName ?: "—",
+                text = stageName ?: "—",
                 fontWeight = FontWeight.ExtraBold,
-                fontSize = 24.sp,
+                fontSize = 18.sp,
                 color = stageColor,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1f),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = "TIMETABLE",
-                fontFamily = FontFamily.Monospace,
-                fontSize = 9.sp,
-                color = Color(0xFF7A7A7A),
-                letterSpacing = 0.15.sp
             )
         }
 
@@ -80,11 +85,12 @@ fun TimetableScreen(
             endsInMins = info?.nowMinsLeft ?: 0
         )
 
-        if (!info?.nextArtist.isNullOrBlank()) {
+        val nextArtist = info?.nextArtist
+        if (!nextArtist.isNullOrBlank()) {
             TimetableSlot(
                 active = false,
                 time = info?.nextStart ?: "—",
-                artist = info!!.nextArtist!!,
+                artist = nextArtist,
                 label = "UP NEXT",
                 stageColor = stageColor,
                 progress = 0f,
@@ -107,7 +113,7 @@ private fun TimetableSlot(
     val ink = if (active) stageColor else Color(0xFF6F6F6F)
     val dotColor = if (active) stageColor else Color(0xFF3A3A3A)
     val artistColor = if (active) Color.White else Color(0xFF9A9A9A)
-    val artistSize = if (artist.length > 14) 20.sp else 24.sp
+    val artistSize = if (artist.length > 14) 14.sp else 16.sp
 
     Row(
         modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
@@ -117,15 +123,15 @@ private fun TimetableSlot(
         Text(
             text = time,
             fontFamily = FontFamily.Monospace,
-            fontSize = 11.sp,
+            fontSize = 10.sp,
             color = ink,
             textAlign = TextAlign.End,
             modifier = Modifier
-                .width(44.dp)
+                .width(33.dp)
                 .padding(top = 3.dp)
         )
 
-        Spacer(Modifier.width(10.dp))
+        Spacer(Modifier.width(3.dp))
 
         // Timeline dot
         Box(
@@ -134,13 +140,13 @@ private fun TimetableSlot(
         ) {
             Box(
                 modifier = Modifier
-                    .padding(top = 4.dp)
-                    .size(9.dp)
+                    .padding(top = 6.dp)
+                    .size(6.dp)
                     .background(dotColor, CircleShape)
             )
         }
 
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.width(3.dp))
 
         // Content column
         Column(modifier = Modifier.weight(1f)) {
@@ -187,4 +193,22 @@ private fun TimetableSlot(
             }
         }
     }
+}
+
+@Preview(device = WearDevices.SMALL_ROUND, showSystemUi = true)
+@Composable
+private fun TimetableScreenPreview() {
+    TimetableScreenContent(
+        stageName = "BLUE",
+        stageColor = Color(0xFF0BDBEF),
+        info = NowAndNext(
+            nowArtist = "Headhunterz",
+            nowStart = "21:00",
+            nowEnd = "22:00",
+            nowProgress = 60,
+            nowMinsLeft = 24,
+            nextArtist = "Noisecontrollers",
+            nextStart = "22:00"
+        )
+    )
 }

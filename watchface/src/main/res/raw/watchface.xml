@@ -6,461 +6,18 @@
     <Scene backgroundColor="#000000">
 
         <!-- ================================================================
-             SLOT 0 — stage id (SHORT_TEXT): "blue","red",...,"gps_error","".
-             Full-face bounds so arc PartDraw coordinates are in watch space.
-             Stage condition lives INSIDE this slot's own Complication context
-             so [COMPLICATION.TEXT] (own-slot reference) is used — not the
-             cross-slot [COMPLICATION_0.TEXT] that fails at Scene level.
-             Arc progress uses [COMPLICATION_1.RANGED_VALUE_CURRENT] cross-slot
-             (numeric cross-slot references are supported by the WFF runtime).
+             SLOT 0 — arc + artist (RANGED_VALUE)
+               value = set progress 0-100
+               text  = stage hex color e.g. "#0BDBEF"  (or "#606060" / "#303030")
+               title = artist name (empty when not at a stage)
+             All rendering stays inside this slot's own Complication context
+             so [COMPLICATION.TEXT/TITLE/RANGED_VALUE_CURRENT] are own-slot
+             references that the WFF runtime supports. The stage hex color is
+             used directly as the arc stroke color and artist font color —
+             no 14-way branch needed.
              ================================================================ -->
         <ComplicationSlot
             slotId="0"
-            supportedTypes="SHORT_TEXT"
-            name="stage_id"
-            isCustomizable="FALSE"
-            x="0" y="0" width="450" height="450">
-            <BoundingBox x="0" y="0" width="450" height="450" />
-            <DefaultProviderPolicy
-                defaultSystemProvider="EMPTY"
-                defaultSystemProviderType="SHORT_TEXT"
-                primaryProvider="dev.girg.qwatch/dev.girg.qwatch.complication.StageComplicationService"
-                primaryProviderType="SHORT_TEXT" />
-            <Complication type="SHORT_TEXT">
-                <Condition>
-                    <Expressions>
-                        <Expression name="isBlue">[COMPLICATION.TEXT] == "blue"</Expression>
-                        <Expression name="isRed">[COMPLICATION.TEXT] == "red"</Expression>
-                        <Expression name="isBlack">[COMPLICATION.TEXT] == "black"</Expression>
-                        <Expression name="isIndigo">[COMPLICATION.TEXT] == "indigo"</Expression>
-                        <Expression name="isBrown">[COMPLICATION.TEXT] == "brown"</Expression>
-                        <Expression name="isMagenta">[COMPLICATION.TEXT] == "magenta"</Expression>
-                        <Expression name="isUv">[COMPLICATION.TEXT] == "uv"</Expression>
-                        <Expression name="isGreen">[COMPLICATION.TEXT] == "green"</Expression>
-                        <Expression name="isYellow">[COMPLICATION.TEXT] == "yellow"</Expression>
-                        <Expression name="isGold">[COMPLICATION.TEXT] == "gold"</Expression>
-                        <Expression name="isOrange">[COMPLICATION.TEXT] == "orange_light_district"</Expression>
-                        <Expression name="isPurple">[COMPLICATION.TEXT] == "purple"</Expression>
-                        <Expression name="isSilver">[COMPLICATION.TEXT] == "silver"</Expression>
-                        <Expression name="isPink">[COMPLICATION.TEXT] == "pink"</Expression>
-                        <Expression name="isGpsError">[COMPLICATION.TEXT] == "gps_error"</Expression>
-                    </Expressions>
-
-                    <!-- BLUE #0BDBEF -->
-                    <Compare expression="isBlue">
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="41">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90" endAngle="270">
-                                <Stroke cap="ROUND" color="#0BDBEF" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#0BDBEF" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="0">
-                            <Variant mode="AMBIENT" target="alpha" value="77" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#0BDBEF" thickness="3" />
-                            </Arc>
-                        </PartDraw>
-                        <PartText x="0" y="148" width="450" height="20">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Text align="CENTER">
-                                <Font family="SYNC_TO_DEVICE" size="12" color="#6F6F6F">NOW · BLUE</Font>
-                            </Text>
-                        </PartText>
-                    </Compare>
-
-                    <!-- RED #FF0000 -->
-                    <Compare expression="isRed">
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="41">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90" endAngle="270">
-                                <Stroke cap="ROUND" color="#FF0000" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#FF0000" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="0">
-                            <Variant mode="AMBIENT" target="alpha" value="77" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#FF0000" thickness="3" />
-                            </Arc>
-                        </PartDraw>
-                        <PartText x="0" y="148" width="450" height="20">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Text align="CENTER">
-                                <Font family="SYNC_TO_DEVICE" size="12" color="#6F6F6F">NOW · RED</Font>
-                            </Text>
-                        </PartText>
-                    </Compare>
-
-                    <!-- BLACK #9A9A9A -->
-                    <Compare expression="isBlack">
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="41">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90" endAngle="270">
-                                <Stroke cap="ROUND" color="#9A9A9A" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#9A9A9A" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="0">
-                            <Variant mode="AMBIENT" target="alpha" value="77" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#9A9A9A" thickness="3" />
-                            </Arc>
-                        </PartDraw>
-                        <PartText x="0" y="148" width="450" height="20">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Text align="CENTER">
-                                <Font family="SYNC_TO_DEVICE" size="12" color="#6F6F6F">NOW · BLACK</Font>
-                            </Text>
-                        </PartText>
-                    </Compare>
-
-                    <!-- INDIGO #3842DA -->
-                    <Compare expression="isIndigo">
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="41">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90" endAngle="270">
-                                <Stroke cap="ROUND" color="#3842DA" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#3842DA" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="0">
-                            <Variant mode="AMBIENT" target="alpha" value="77" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#3842DA" thickness="3" />
-                            </Arc>
-                        </PartDraw>
-                        <PartText x="0" y="148" width="450" height="20">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Text align="CENTER">
-                                <Font family="SYNC_TO_DEVICE" size="12" color="#6F6F6F">NOW · INDIGO</Font>
-                            </Text>
-                        </PartText>
-                    </Compare>
-
-                    <!-- BROWN #936037 -->
-                    <Compare expression="isBrown">
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="41">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90" endAngle="270">
-                                <Stroke cap="ROUND" color="#936037" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#936037" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="0">
-                            <Variant mode="AMBIENT" target="alpha" value="77" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#936037" thickness="3" />
-                            </Arc>
-                        </PartDraw>
-                        <PartText x="0" y="148" width="450" height="20">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Text align="CENTER">
-                                <Font family="SYNC_TO_DEVICE" size="12" color="#6F6F6F">NOW · BROWN</Font>
-                            </Text>
-                        </PartText>
-                    </Compare>
-
-                    <!-- MAGENTA #FF008B -->
-                    <Compare expression="isMagenta">
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="41">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90" endAngle="270">
-                                <Stroke cap="ROUND" color="#FF008B" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#FF008B" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="0">
-                            <Variant mode="AMBIENT" target="alpha" value="77" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#FF008B" thickness="3" />
-                            </Arc>
-                        </PartDraw>
-                        <PartText x="0" y="148" width="450" height="20">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Text align="CENTER">
-                                <Font family="SYNC_TO_DEVICE" size="12" color="#6F6F6F">NOW · MAGENTA</Font>
-                            </Text>
-                        </PartText>
-                    </Compare>
-
-                    <!-- UV #D492FF -->
-                    <Compare expression="isUv">
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="41">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90" endAngle="270">
-                                <Stroke cap="ROUND" color="#D492FF" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#D492FF" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="0">
-                            <Variant mode="AMBIENT" target="alpha" value="77" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#D492FF" thickness="3" />
-                            </Arc>
-                        </PartDraw>
-                        <PartText x="0" y="148" width="450" height="20">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Text align="CENTER">
-                                <Font family="SYNC_TO_DEVICE" size="12" color="#6F6F6F">NOW · U.V.</Font>
-                            </Text>
-                        </PartText>
-                    </Compare>
-
-                    <!-- GREEN #00FF00 -->
-                    <Compare expression="isGreen">
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="41">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90" endAngle="270">
-                                <Stroke cap="ROUND" color="#00FF00" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#00FF00" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="0">
-                            <Variant mode="AMBIENT" target="alpha" value="77" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#00FF00" thickness="3" />
-                            </Arc>
-                        </PartDraw>
-                        <PartText x="0" y="148" width="450" height="20">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Text align="CENTER">
-                                <Font family="SYNC_TO_DEVICE" size="12" color="#6F6F6F">NOW · GREEN</Font>
-                            </Text>
-                        </PartText>
-                    </Compare>
-
-                    <!-- YELLOW #F1E300 -->
-                    <Compare expression="isYellow">
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="41">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90" endAngle="270">
-                                <Stroke cap="ROUND" color="#F1E300" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#F1E300" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="0">
-                            <Variant mode="AMBIENT" target="alpha" value="77" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#F1E300" thickness="3" />
-                            </Arc>
-                        </PartDraw>
-                        <PartText x="0" y="148" width="450" height="20">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Text align="CENTER">
-                                <Font family="SYNC_TO_DEVICE" size="12" color="#6F6F6F">NOW · YELLOW</Font>
-                            </Text>
-                        </PartText>
-                    </Compare>
-
-                    <!-- GOLD #BB9551 -->
-                    <Compare expression="isGold">
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="41">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90" endAngle="270">
-                                <Stroke cap="ROUND" color="#BB9551" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#BB9551" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="0">
-                            <Variant mode="AMBIENT" target="alpha" value="77" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#BB9551" thickness="3" />
-                            </Arc>
-                        </PartDraw>
-                        <PartText x="0" y="148" width="450" height="20">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Text align="CENTER">
-                                <Font family="SYNC_TO_DEVICE" size="12" color="#6F6F6F">NOW · GOLD</Font>
-                            </Text>
-                        </PartText>
-                    </Compare>
-
-                    <!-- ORANGE LIGHT DISTRICT #FF6500 -->
-                    <Compare expression="isOrange">
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="41">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90" endAngle="270">
-                                <Stroke cap="ROUND" color="#FF6500" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#FF6500" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="0">
-                            <Variant mode="AMBIENT" target="alpha" value="77" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#FF6500" thickness="3" />
-                            </Arc>
-                        </PartDraw>
-                        <PartText x="0" y="148" width="450" height="20">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Text align="CENTER">
-                                <Font family="SYNC_TO_DEVICE" size="12" color="#6F6F6F">NOW · ORANGE LIGHT DISTRICT</Font>
-                            </Text>
-                        </PartText>
-                    </Compare>
-
-                    <!-- PURPLE #A100FF -->
-                    <Compare expression="isPurple">
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="41">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90" endAngle="270">
-                                <Stroke cap="ROUND" color="#A100FF" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#A100FF" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="0">
-                            <Variant mode="AMBIENT" target="alpha" value="77" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#A100FF" thickness="3" />
-                            </Arc>
-                        </PartDraw>
-                        <PartText x="0" y="148" width="450" height="20">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Text align="CENTER">
-                                <Font family="SYNC_TO_DEVICE" size="12" color="#6F6F6F">NOW · PURPLE</Font>
-                            </Text>
-                        </PartText>
-                    </Compare>
-
-                    <!-- SILVER #DADADA -->
-                    <Compare expression="isSilver">
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="41">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90" endAngle="270">
-                                <Stroke cap="ROUND" color="#DADADA" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#DADADA" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="0">
-                            <Variant mode="AMBIENT" target="alpha" value="77" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#DADADA" thickness="3" />
-                            </Arc>
-                        </PartDraw>
-                        <PartText x="0" y="148" width="450" height="20">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Text align="CENTER">
-                                <Font family="SYNC_TO_DEVICE" size="12" color="#6F6F6F">NOW · SILVER</Font>
-                            </Text>
-                        </PartText>
-                    </Compare>
-
-                    <!-- PINK #EF81A0 -->
-                    <Compare expression="isPink">
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="41">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90" endAngle="270">
-                                <Stroke cap="ROUND" color="#EF81A0" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#EF81A0" thickness="13" />
-                            </Arc>
-                        </PartDraw>
-                        <PartDraw x="18" y="18" width="414" height="414" alpha="0">
-                            <Variant mode="AMBIENT" target="alpha" value="77" />
-                            <Arc direction="CLOCKWISE" startAngle="-90.0" endAngle="-90.0 + [COMPLICATION_1.RANGED_VALUE_CURRENT] * 3.6">
-                                <Stroke cap="ROUND" color="#EF81A0" thickness="3" />
-                            </Arc>
-                        </PartDraw>
-                        <PartText x="0" y="148" width="450" height="20">
-                            <Variant mode="AMBIENT" target="alpha" value="0" />
-                            <Text align="CENTER">
-                                <Font family="SYNC_TO_DEVICE" size="12" color="#6F6F6F">NOW · PINK</Font>
-                            </Text>
-                        </PartText>
-                    </Compare>
-
-                    <!-- GPS error -->
-                    <Compare expression="isGpsError">
-                        <PartText x="0" y="197" width="450" height="56">
-                            <Text align="CENTER">
-                                <Font family="SYNC_TO_DEVICE" size="30" color="#888888">GPS UNAVAILABLE</Font>
-                            </Text>
-                        </PartText>
-                    </Compare>
-
-                    <!-- Default: between stages / festival inactive — nothing extra -->
-                    <Default />
-                </Condition>
-            </Complication>
-        </ComplicationSlot>
-
-        <!-- ================================================================
-             SLOT 1 — now playing (RANGED_VALUE): value=progress 0-100,
-             text=artistName, title="XM LEFT" (empty when not playing).
-             Artist and countdown rendered inside own Complication context
-             using [COMPLICATION.TEXT] / [COMPLICATION.TITLE] (own-slot).
-             ================================================================ -->
-        <ComplicationSlot
-            slotId="1"
             supportedTypes="RANGED_VALUE"
             name="now_playing"
             isCustomizable="FALSE"
@@ -472,20 +29,34 @@
                 primaryProvider="dev.girg.qwatch/dev.girg.qwatch.complication.NowPlayingComplicationService"
                 primaryProviderType="RANGED_VALUE" />
             <Complication type="RANGED_VALUE">
-                <!-- Artist name — white, large -->
+                <!-- Arc track — full circle, stage color at 16% opacity -->
+                <PartDraw x="18" y="18" width="414" height="414" alpha="41">
+                    <Variant mode="AMBIENT" target="alpha" value="0" />
+                    <Arc direction="CLOCKWISE" startAngle="-90" endAngle="270">
+                        <Stroke cap="ROUND" color="[COMPLICATION.TEXT]" thickness="13" />
+                    </Arc>
+                </PartDraw>
+                <!-- Arc fill — progress sweep, stage color full opacity -->
+                <PartDraw x="18" y="18" width="414" height="414">
+                    <Variant mode="AMBIENT" target="alpha" value="0" />
+                    <Arc direction="CLOCKWISE" startAngle="-90.0"
+                         endAngle="-90.0 + [COMPLICATION.RANGED_VALUE_CURRENT] * 3.6">
+                        <Stroke cap="ROUND" color="[COMPLICATION.TEXT]" thickness="13" />
+                    </Arc>
+                </PartDraw>
+                <!-- Arc fill — ambient mode, thin stroke at 30% opacity -->
+                <PartDraw x="18" y="18" width="414" height="414" alpha="0">
+                    <Variant mode="AMBIENT" target="alpha" value="77" />
+                    <Arc direction="CLOCKWISE" startAngle="-90.0"
+                         endAngle="-90.0 + [COMPLICATION.RANGED_VALUE_CURRENT] * 3.6">
+                        <Stroke cap="ROUND" color="[COMPLICATION.TEXT]" thickness="3" />
+                    </Arc>
+                </PartDraw>
+                <!-- Artist name — stage color, large, hidden in ambient -->
                 <PartText x="0" y="172" width="450" height="68">
                     <Variant mode="AMBIENT" target="alpha" value="0" />
                     <Text align="CENTER">
-                        <Font family="SYNC_TO_DEVICE" size="52" color="#FFFFFF" weight="BOLD">
-                            <Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template>
-                        </Font>
-                    </Text>
-                </PartText>
-                <!-- Countdown e.g. "37M LEFT", empty string when not playing -->
-                <PartText x="0" y="303" width="450" height="20">
-                    <Variant mode="AMBIENT" target="alpha" value="0" />
-                    <Text align="CENTER">
-                        <Font family="SYNC_TO_DEVICE" size="12" color="#6F6F6F">
+                        <Font family="SYNC_TO_DEVICE" size="52" color="[COMPLICATION.TEXT]" weight="BOLD">
                             <Template>%s<Parameter expression="[COMPLICATION.TITLE]" /></Template>
                         </Font>
                     </Text>
@@ -494,8 +65,36 @@
         </ComplicationSlot>
 
         <!-- ================================================================
-             SLOT 2 — next artist (SHORT_TEXT): text="NEXT · Name" or "".
-             Rendered inside own Complication context using [COMPLICATION.TEXT].
+             SLOT 1 — countdown (SHORT_TEXT)
+               text = "37M LEFT" or "" when not at a stage
+             ================================================================ -->
+        <ComplicationSlot
+            slotId="1"
+            supportedTypes="SHORT_TEXT"
+            name="countdown"
+            isCustomizable="FALSE"
+            x="0" y="0" width="450" height="450">
+            <BoundingBox x="0" y="0" width="450" height="450" />
+            <DefaultProviderPolicy
+                defaultSystemProvider="EMPTY"
+                defaultSystemProviderType="SHORT_TEXT"
+                primaryProvider="dev.girg.qwatch/dev.girg.qwatch.complication.CountdownComplicationService"
+                primaryProviderType="SHORT_TEXT" />
+            <Complication type="SHORT_TEXT">
+                <PartText x="0" y="303" width="450" height="20">
+                    <Variant mode="AMBIENT" target="alpha" value="0" />
+                    <Text align="CENTER">
+                        <Font family="SYNC_TO_DEVICE" size="12" color="#6F6F6F">
+                            <Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template>
+                        </Font>
+                    </Text>
+                </PartText>
+            </Complication>
+        </ComplicationSlot>
+
+        <!-- ================================================================
+             SLOT 2 — next artist (SHORT_TEXT)
+               text = "NEXT · Name" or ""
              ================================================================ -->
         <ComplicationSlot
             slotId="2"

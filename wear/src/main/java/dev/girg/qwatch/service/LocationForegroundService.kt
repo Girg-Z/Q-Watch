@@ -19,9 +19,9 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import dev.girg.qwatch.R
+import dev.girg.qwatch.complication.CountdownComplicationService
 import dev.girg.qwatch.complication.NextArtistComplicationService
 import dev.girg.qwatch.complication.NowPlayingComplicationService
-import dev.girg.qwatch.complication.StageComplicationService
 import dev.girg.qwatch.data.StageState
 import dev.girg.qwatch.data.writeStageState
 import dev.girg.qwatch.resolver.FestivalDay
@@ -117,8 +117,8 @@ class LocationForegroundService : Service() {
     private fun requestComplicationUpdate() {
         val ctx = applicationContext
         listOf(
-            StageComplicationService::class.java,
             NowPlayingComplicationService::class.java,
+            CountdownComplicationService::class.java,
             NextArtistComplicationService::class.java
         ).forEach { serviceClass ->
             ComplicationDataSourceUpdateRequester

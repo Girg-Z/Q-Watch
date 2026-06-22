@@ -83,7 +83,7 @@ fun StageListScreen(
     ) {
         LazyColumn(
             state = listState,
-            contentPadding = PaddingValues(top = 48.dp, start = 36.dp, end = 36.dp, bottom = 96.dp)
+            contentPadding = PaddingValues(top = 48.dp, start = 30.dp, end = 30.dp, bottom = 96.dp)
         ) {
             item {
                 Box(
@@ -96,7 +96,7 @@ fun StageListScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "★ FAVOURITES",
+                        text = "♥ FAVOURITES",
                         fontFamily = FontFamily.Monospace,
                         fontSize = 13.sp,
                         color = Color(0xFFE0C24A),
@@ -215,30 +215,20 @@ private fun StageRow(
             Text(
                 text = stage.displayName,
                 fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
+                fontSize = 14.sp,
                 color = nameColor,
-                lineHeight = 24.sp
+                lineHeight = 15.sp
             )
             if (!artist.isNullOrBlank()) {
                 Text(
                     text = artist,
                     fontFamily = FontFamily.Monospace,
-                    fontSize = 11.sp,
+                    fontSize = 13.sp,
                     color = Color(0xFF7C7C7C),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
             }
-        }
-
-        if (selected) {
-            Text(
-                text = "LIVE",
-                fontFamily = FontFamily.Monospace,
-                fontSize = 10.sp,
-                color = stage.color,
-                letterSpacing = 0.1.sp
-            )
         }
     }
 }

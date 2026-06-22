@@ -92,7 +92,7 @@ private fun FavouritesApp(modifier: Modifier = Modifier) {
             .background(Color(0xFF0A0A0A))
     ) {
         Text(
-            text = "★ FAVOURITE SETS",
+            text = "♥ FAVOURITE SETS",
             fontFamily = FontFamily.Monospace,
             fontSize = 13.sp,
             color = Color(0xFFE0C24A),
@@ -192,7 +192,7 @@ private fun SetRow(
         }
         Spacer(Modifier.width(12.dp))
         Text(
-            text = if (isFavourite) "★" else "☆",
+            text = if (isFavourite) "♥" else "♡",
             fontSize = 22.sp,
             color = if (isFavourite) Color(0xFFE0C24A) else Color(0xFF555555)
         )

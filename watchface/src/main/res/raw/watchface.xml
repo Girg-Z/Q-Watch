@@ -133,7 +133,7 @@
                Small, secondary line near the top of the face. Its tap box is
                sized to this line (and kept non-overlapping with the other
                slots) so tapping the favourite name opens the wear app on the
-               Favourites screen (tap action is attached to the complication
+               stage list screen (tap action is attached to the complication
                data itself).
              ================================================================ -->
         <ComplicationSlot
@@ -142,7 +142,7 @@
             name="next_favourite"
             isCustomizable="FALSE"
             x="0" y="0" width="450" height="450">
-            <!-- Tap target = the "★ artist" line itself; tapping it opens the Favourites screen. -->
+            <!-- Tap target = the "★ artist" line itself; tapping it opens the stage list screen. -->
             <BoundingBox x="40" y="82" width="370" height="62" />
             <DefaultProviderPolicy
                 defaultSystemProvider="EMPTY"

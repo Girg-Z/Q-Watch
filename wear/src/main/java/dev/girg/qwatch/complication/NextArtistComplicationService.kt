@@ -29,6 +29,6 @@ class NextArtistComplicationService : SuspendingComplicationDataSourceService() 
             contentDescription = PlainComplicationText.Builder(text).build()
         )
             // Full-screen slot: carry the tap action so a tap landing here still opens the app.
-            .setTapAction(FavouritesLauncher.pendingIntent(applicationContext))
+            .setTapAction(AppLauncher.stages(applicationContext))
             .build()
 }

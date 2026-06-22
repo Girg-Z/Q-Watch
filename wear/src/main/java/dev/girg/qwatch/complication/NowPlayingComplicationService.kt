@@ -58,7 +58,7 @@ class NowPlayingComplicationService : SuspendingComplicationDataSourceService() 
         )
             .setText(PlainComplicationText.Builder(hexColor).build())
             .setTitle(PlainComplicationText.Builder(artistName).build())
-            // Slot 0 spans the whole face, so this makes a tap anywhere open the Favourites screen.
-            .setTapAction(FavouritesLauncher.pendingIntent(applicationContext))
+            // Slot 0 spans the whole face, so this makes a tap anywhere open the stage list screen.
+            .setTapAction(AppLauncher.stages(applicationContext))
             .build()
 }

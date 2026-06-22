@@ -6,23 +6,23 @@ import android.content.Context
 import android.content.Intent
 
 /**
- * Builds the PendingIntent that opens the wear app on the Favourites screen. Used as the tap action
- * for complications so that tapping the watch face opens the app. The now-playing complication
- * (slot 0) covers the whole face, so this effectively makes a tap anywhere open the app.
+ * Builds the PendingIntent that opens the wear app on the stage list screen. Used as the tap action
+ * for the watch-face complications, so tapping anywhere on the face opens the stage screen (the
+ * now-playing complication spans the whole face).
  */
-object FavouritesLauncher {
-    const val EXTRA_OPEN_FAVOURITES = "open_favourites"
-    private const val REQUEST_OPEN_FAVOURITES = 0x1A2B
+object AppLauncher {
+    const val EXTRA_OPEN_STAGES = "open_stages"
+    private const val REQUEST_OPEN_STAGES = 0x1A2C
 
-    fun pendingIntent(context: Context): PendingIntent {
+    fun stages(context: Context): PendingIntent {
         val intent = Intent(Intent.ACTION_MAIN).apply {
             component = ComponentName(context, "dev.girg.qwatch.presentation.MainActivity")
-            putExtra(EXTRA_OPEN_FAVOURITES, true)
+            putExtra(EXTRA_OPEN_STAGES, true)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
         return PendingIntent.getActivity(
             context,
-            REQUEST_OPEN_FAVOURITES,
+            REQUEST_OPEN_STAGES,
             intent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )

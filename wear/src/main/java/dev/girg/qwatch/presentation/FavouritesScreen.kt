@@ -89,7 +89,7 @@ fun FavouritesScreen(
             contentAlignment = Alignment.BottomCenter
         ) {
             Text(
-                text = "★ FAVOURITES",
+                text = "♥ FAVOURITES",
                 fontFamily = FontFamily.Monospace,
                 fontSize = 11.sp,
                 color = Color(0xFF7A7A7A),

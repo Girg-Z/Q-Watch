@@ -34,7 +34,7 @@ import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import androidx.wear.compose.material3.lazy.transformedHeight
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
-import dev.girg.qwatch.complication.FavouritesLauncher
+import dev.girg.qwatch.complication.AppLauncher
 import dev.girg.qwatch.complication.NextArtistComplicationService
 import dev.girg.qwatch.complication.NowPlayingComplicationService
 import dev.girg.qwatch.complication.StageComplicationService
@@ -57,8 +57,8 @@ private sealed class Screen {
 
 class MainActivity : ComponentActivity() {
 
-    // Bumped whenever a new intent asks us to jump to the Favourites screen (e.g. complication tap).
-    private val openFavouritesRequest = mutableStateOf(0)
+    // Bumped whenever a new intent asks us to jump to the stage list screen (e.g. watch-face tap).
+    private val openStagesRequest = mutableStateOf(0)
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -76,8 +76,8 @@ class MainActivity : ComponentActivity() {
             requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
         }
 
-        if (intent?.getBooleanExtra(FavouritesLauncher.EXTRA_OPEN_FAVOURITES, false) == true) {
-            openFavouritesRequest.value++
+        if (intent?.getBooleanExtra(AppLauncher.EXTRA_OPEN_STAGES, false) == true) {
+            openStagesRequest.value++
         }
 
         val timetableRepo = TimetableRepository(this)
@@ -87,7 +87,7 @@ class MainActivity : ComponentActivity() {
                 AppContent(
                     context = this,
                     timetableRepo = timetableRepo,
-                    openFavouritesRequest = openFavouritesRequest.value
+                    openStagesRequest = openStagesRequest.value
                 )
             }
         }
@@ -96,8 +96,8 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        if (intent.getBooleanExtra(FavouritesLauncher.EXTRA_OPEN_FAVOURITES, false)) {
-            openFavouritesRequest.value++
+        if (intent.getBooleanExtra(AppLauncher.EXTRA_OPEN_STAGES, false)) {
+            openStagesRequest.value++
         }
     }
 
@@ -107,16 +107,16 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun AppContent(context: Context, timetableRepo: TimetableRepository, openFavouritesRequest: Int) {
+private fun AppContent(context: Context, timetableRepo: TimetableRepository, openStagesRequest: Int) {
     val stageState by context.readStageStateFlow().collectAsState(initial = StageState())
     var screen by remember { mutableStateOf<Screen>(Screen.Main) }
     // Hoisted here (the parent that survives screen switches) so the stage list keeps its scroll
     // position when returning from the timetable.
     val stageListState = rememberLazyListState()
 
-    // Jump to Favourites whenever the activity is (re)launched from the complication tap.
-    LaunchedEffect(openFavouritesRequest) {
-        if (openFavouritesRequest > 0) screen = Screen.Favourites
+    // Jump to the stage list whenever the activity is (re)launched from a watch-face tap.
+    LaunchedEffect(openStagesRequest) {
+        if (openStagesRequest > 0) screen = Screen.Main
     }
 
     BackHandler(enabled = screen != Screen.Main) {

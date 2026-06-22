@@ -37,6 +37,6 @@ class NextFavouriteComplicationService : SuspendingComplicationDataSourceService
             text = PlainComplicationText.Builder(text).build(),
             contentDescription = PlainComplicationText.Builder("Next favourite set").build()
         )
-            .setTapAction(FavouritesLauncher.pendingIntent(applicationContext))
+            .setTapAction(AppLauncher.stages(applicationContext))
             .build()
 }

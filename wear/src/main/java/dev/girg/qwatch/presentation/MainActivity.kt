@@ -12,6 +12,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +33,7 @@ import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import androidx.wear.compose.material3.lazy.transformedHeight
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
+import dev.girg.qwatch.complication.FavouritesLauncher
 import dev.girg.qwatch.complication.NextArtistComplicationService
 import dev.girg.qwatch.complication.NowPlayingComplicationService
 import dev.girg.qwatch.complication.StageComplicationService
@@ -48,10 +50,14 @@ import java.util.Locale
 private sealed class Screen {
     object Main : Screen()
     object Debug : Screen()
+    object Favourites : Screen()
     data class Timetable(val stageId: String) : Screen()
 }
 
 class MainActivity : ComponentActivity() {
+
+    // Bumped whenever a new intent asks us to jump to the Favourites screen (e.g. complication tap).
+    private val openFavouritesRequest = mutableStateOf(0)
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -69,12 +75,28 @@ class MainActivity : ComponentActivity() {
             requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
         }
 
+        if (intent?.getBooleanExtra(FavouritesLauncher.EXTRA_OPEN_FAVOURITES, false) == true) {
+            openFavouritesRequest.value++
+        }
+
         val timetableRepo = TimetableRepository(this)
 
         setContent {
             QWatchTheme {
-                AppContent(context = this, timetableRepo = timetableRepo)
+                AppContent(
+                    context = this,
+                    timetableRepo = timetableRepo,
+                    openFavouritesRequest = openFavouritesRequest.value
+                )
             }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (intent.getBooleanExtra(FavouritesLauncher.EXTRA_OPEN_FAVOURITES, false)) {
+            openFavouritesRequest.value++
         }
     }
 
@@ -84,9 +106,14 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun AppContent(context: Context, timetableRepo: TimetableRepository) {
+private fun AppContent(context: Context, timetableRepo: TimetableRepository, openFavouritesRequest: Int) {
     val stageState by context.readStageStateFlow().collectAsState(initial = StageState())
     var screen by remember { mutableStateOf<Screen>(Screen.Main) }
+
+    // Jump to Favourites whenever the activity is (re)launched from the complication tap.
+    LaunchedEffect(openFavouritesRequest) {
+        if (openFavouritesRequest > 0) screen = Screen.Favourites
+    }
 
     BackHandler(enabled = screen != Screen.Main) {
         screen = Screen.Main
@@ -94,12 +121,14 @@ private fun AppContent(context: Context, timetableRepo: TimetableRepository) {
 
     when (val s = screen) {
         Screen.Debug -> DebugScreen(context = context)
+        Screen.Favourites -> FavouritesScreen(context = context, timetableRepo = timetableRepo)
         Screen.Main -> StageListScreen(
             context = context,
             selectedStageId = stageState.stageId,
             timetableRepo = timetableRepo,
             onStageSelected = { stageId -> screen = Screen.Timetable(stageId) },
-            onNavigateToDebug = { screen = Screen.Debug }
+            onNavigateToDebug = { screen = Screen.Debug },
+            onNavigateToFavourites = { screen = Screen.Favourites }
         )
         is Screen.Timetable -> TimetableScreen(
             stageId = s.stageId,

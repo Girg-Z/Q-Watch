@@ -129,6 +129,39 @@
         </ComplicationSlot>
 
         <!-- ================================================================
+             SLOT 3 — next favourite set (SHORT_TEXT): "★ Headhunterz" or ""
+               Small, secondary line near the top of the face. Its tap box is
+               sized to this line (and kept non-overlapping with the other
+               slots) so tapping the favourite name opens the wear app on the
+               Favourites screen (tap action is attached to the complication
+               data itself).
+             ================================================================ -->
+        <ComplicationSlot
+            slotId="3"
+            supportedTypes="SHORT_TEXT"
+            name="next_favourite"
+            isCustomizable="FALSE"
+            x="0" y="0" width="450" height="450">
+            <!-- Tap target = the "★ artist" line itself; tapping it opens the Favourites screen. -->
+            <BoundingBox x="40" y="82" width="370" height="62" />
+            <DefaultProviderPolicy
+                defaultSystemProvider="EMPTY"
+                defaultSystemProviderType="SHORT_TEXT"
+                primaryProvider="dev.girg.qwatch/dev.girg.qwatch.complication.NextFavouriteComplicationService"
+                primaryProviderType="SHORT_TEXT" />
+            <Complication type="SHORT_TEXT">
+                <PartText x="0" y="104" width="450" height="22">
+                    <Variant mode="AMBIENT" target="alpha" value="0" />
+                    <Text align="CENTER">
+                        <Font family="SYNC_TO_DEVICE" size="16" color="#E0C24A">
+                            <Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template>
+                        </Font>
+                    </Text>
+                </PartText>
+            </Complication>
+        </ComplicationSlot>
+
+        <!-- ================================================================
              CLOCK — active mode (hidden in ambient)
              ================================================================ -->
         <DigitalClock x="0" y="252" width="450" height="48">

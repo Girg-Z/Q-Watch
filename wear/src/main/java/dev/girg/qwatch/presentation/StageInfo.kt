@@ -28,3 +28,7 @@ val FESTIVAL_STAGES = listOf(
 
 fun stageColorFor(stageId: String?): Color =
     FESTIVAL_STAGES.find { it.id == stageId }?.color ?: Color(0xFF808080)
+
+/** Maps a timetable location (e.g. "RED", "UV") back to its stage, or null if unknown. */
+fun stageForLocation(location: String?): StageInfo? =
+    FESTIVAL_STAGES.find { it.timetableLocation == location }

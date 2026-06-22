@@ -41,7 +41,8 @@ fun StageListScreen(
     selectedStageId: String?,
     timetableRepo: TimetableRepository,
     onStageSelected: (stageId: String) -> Unit,
-    onNavigateToDebug: () -> Unit
+    onNavigateToDebug: () -> Unit,
+    onNavigateToFavourites: () -> Unit
 ) {
     val listState = rememberLazyListState()
 
@@ -80,6 +81,27 @@ fun StageListScreen(
             state = listState,
             contentPadding = PaddingValues(top = 48.dp, start = 36.dp, end = 36.dp, bottom = 96.dp)
         ) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(Color(0xFF161616))
+                        .clickable { onNavigateToFavourites() }
+                        .padding(vertical = 12.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "★ FAVOURITES",
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 13.sp,
+                        color = Color(0xFFE0C24A),
+                        letterSpacing = 0.12.sp
+                    )
+                }
+                Spacer(Modifier.height(8.dp))
+            }
+
             items(visibleStages) { stage ->
                 val selected = stage.id == selectedStageId
                 val artist = currentArtists[stage.id]

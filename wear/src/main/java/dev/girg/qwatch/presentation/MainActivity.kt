@@ -11,6 +11,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -109,6 +110,9 @@ class MainActivity : ComponentActivity() {
 private fun AppContent(context: Context, timetableRepo: TimetableRepository, openFavouritesRequest: Int) {
     val stageState by context.readStageStateFlow().collectAsState(initial = StageState())
     var screen by remember { mutableStateOf<Screen>(Screen.Main) }
+    // Hoisted here (the parent that survives screen switches) so the stage list keeps its scroll
+    // position when returning from the timetable.
+    val stageListState = rememberLazyListState()
 
     // Jump to Favourites whenever the activity is (re)launched from the complication tap.
     LaunchedEffect(openFavouritesRequest) {
@@ -126,6 +130,7 @@ private fun AppContent(context: Context, timetableRepo: TimetableRepository, ope
             context = context,
             selectedStageId = stageState.stageId,
             timetableRepo = timetableRepo,
+            listState = stageListState,
             onStageSelected = { stageId -> screen = Screen.Timetable(stageId) },
             onNavigateToDebug = { screen = Screen.Debug },
             onNavigateToFavourites = { screen = Screen.Favourites }

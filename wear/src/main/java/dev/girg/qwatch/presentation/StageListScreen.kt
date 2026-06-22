@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,12 +40,11 @@ fun StageListScreen(
     context: Context,
     selectedStageId: String?,
     timetableRepo: TimetableRepository,
+    listState: LazyListState,
     onStageSelected: (stageId: String) -> Unit,
     onNavigateToDebug: () -> Unit,
     onNavigateToFavourites: () -> Unit
 ) {
-    val listState = rememberLazyListState()
-
     val now = remember { ZonedDateTime.now() }
     val visibleStages = remember(now) {
         FESTIVAL_STAGES.filter { timetableRepo.hasEventsToday(it.timetableLocation, now) }
@@ -56,21 +55,26 @@ fun StageListScreen(
         }
     }
 
-    val selectedIndex = remember(selectedStageId) {
-        visibleStages.indexOfFirst { it.id == selectedStageId }.takeIf { it >= 0 }
-    }
+    // Used only by the (currently disabled) auto-centering effect below.
+    // val selectedIndex = remember(selectedStageId) {
+    //     visibleStages.indexOfFirst { it.id == selectedStageId }.takeIf { it >= 0 }
+    // }
 
-    LaunchedEffect(selectedIndex) {
-        if (selectedIndex == null) return@LaunchedEffect
-        // Instant scroll to bring selected item near view, then fine-adjust to centre — no animation, no overshoot
-        listState.scrollToItem((selectedIndex - 1).coerceAtLeast(0))
-        val itemInfo = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == selectedIndex }
-        if (itemInfo != null) {
-            val viewportCenter = (listState.layoutInfo.viewportStartOffset + listState.layoutInfo.viewportEndOffset) / 2
-            val itemCenter = itemInfo.offset + itemInfo.size / 2
-            listState.scrollBy((itemCenter - viewportCenter).toFloat())
-        }
-    }
+    // Auto-centering of the selected stage is disabled for now (it re-scrolled on every back
+    // navigation). Re-enable by uncommenting. NOTE: targetIndex = selectedIndex + 1 accounts for
+    // the "★ FAVOURITES" row at LazyColumn item 0.
+    // LaunchedEffect(selectedIndex) {
+    //     if (selectedIndex == null) return@LaunchedEffect
+    //     val targetIndex = selectedIndex + 1
+    //     // Instant scroll to bring selected item near view, then fine-adjust to centre — no animation, no overshoot
+    //     listState.scrollToItem((targetIndex - 1).coerceAtLeast(0))
+    //     val itemInfo = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == targetIndex }
+    //     if (itemInfo != null) {
+    //         val viewportCenter = (listState.layoutInfo.viewportStartOffset + listState.layoutInfo.viewportEndOffset) / 2
+    //         val itemCenter = itemInfo.offset + itemInfo.size / 2
+    //         listState.scrollBy((itemCenter - viewportCenter).toFloat())
+    //     }
+    // }
 
     Box(
         modifier = Modifier

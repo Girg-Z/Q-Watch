@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
@@ -179,6 +180,27 @@ fun DebugScreen(context: Context) {
             TransformingLazyColumn(contentPadding = padding, state = listState) {
 
                 item {
+                    Button(
+                        onClick = {
+                            context.startForegroundService(
+                                Intent(context, LocationForegroundService::class.java)
+                                    .setAction(LocationForegroundService.ACTION_FORCE_FETCH)
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth().transformedHeight(this, transformSpec),
+                        transformation = SurfaceTransformation(transformSpec)
+                    ) { Text("⟳ Force fetch position") }
+                }
+
+                item {
+                    Button(
+                        onClick = { scope.launch { context.writeSmartMode(!smartMode) } },
+                        modifier = Modifier.fillMaxWidth().transformedHeight(this, transformSpec),
+                        transformation = SurfaceTransformation(transformSpec)
+                    ) { Text("Mode: ${if (smartMode) "SMART" else "DUMB"}") }
+                }
+
+                item {
                     ListHeader(
                         modifier = Modifier.fillMaxWidth().transformedHeight(this, transformSpec),
                         transformation = SurfaceTransformation(transformSpec)
@@ -202,46 +224,53 @@ fun DebugScreen(context: Context) {
                 }
 
                 item {
-                    Button(
-                        onClick = { scope.launch { context.writeSmartMode(!smartMode) } },
-                        modifier = Modifier.fillMaxWidth().transformedHeight(this, transformSpec),
-                        transformation = SurfaceTransformation(transformSpec)
-                    ) { Text("Mode: ${if (smartMode) "SMART" else "DUMB"}") }
-                }
-
-                item {
                     ListHeader(
                         modifier = Modifier.fillMaxWidth().transformedHeight(this, transformSpec),
                         transformation = SurfaceTransformation(transformSpec)
-                    ) { Text("Stages") }
+                    ) { Text("Set name length (long → short)") }
                 }
 
-                val stageIds = listOf(
-                    "blue" to "BLUE", "indigo" to "INDIGO", "black" to "BLACK",
-                    "magenta" to "MAGENTA", "yellow" to "YELLOW", "purple" to "PURPLE",
-                    "uv" to "UV", "gold" to "GOLD", "brown" to "BROWN",
-                    "red" to "RED", "orange_light_district" to "ORANGE",
-                    "green" to "GREEN", "silver" to "SILVER", "pink" to "PINK"
-                )
-                stageIds.forEach { (id, displayName) ->
+                // Sample set names from longest to shortest for testing watch-face text fit.
+                // The leading [n] is the character count so the limit is easy to eyeball.
+                val testSetNames = listOf(
+                    "D-Block & S-te-Fan pres. Music Made Addict",
+                    "The Opening Ceremony with Outsiders",
+                    "Sub Zero Project & Phuture Noize",
+                    "Brennan Heart & Toneshifterz",
+                    "Headhunterz b2b Wildstylez",
+                    "Warface & Rooler",
+                    "Da Tweekaz",
+                    "Rebelion",
+                    "Sefa",
+                    "REBL",
+                    "X"
+                ).sortedByDescending { it.length }
+
+                testSetNames.forEach { name ->
                     item {
                         Button(
                             onClick = {
                                 writeDebugState(StageState(
-                                    stageId = id,
-                                    stageName = displayName,
-                                    artistName = "Test Artist",
+                                    stageId = "red",
+                                    stageName = "RED",
+                                    artistName = name,
                                     isGpsAvailable = true,
                                     isFestivalActive = true,
                                     lastUpdateMillis = System.currentTimeMillis(),
                                     setProgressPercent = 60,
                                     minsToSetEnd = 37,
-                                    nextArtistName = "Headhunterz"
+                                    nextArtistName = name
                                 ))
                             },
                             modifier = Modifier.fillMaxWidth().transformedHeight(this, transformSpec),
                             transformation = SurfaceTransformation(transformSpec)
-                        ) { Text(id) }
+                        ) {
+                            Text(
+                                text = "[${name.length}] $name",
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                 }
 

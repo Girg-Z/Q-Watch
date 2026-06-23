@@ -118,7 +118,26 @@ class LocationForegroundService : Service() {
         }
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int = START_STICKY
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == ACTION_FORCE_FETCH) {
+            serviceScope.launch { forceFetch() }
+        }
+        return START_STICKY
+    }
+
+    /** Debug helper: grab one fix right now and publish the resolved state, bypassing all gates. */
+    private suspend fun forceFetch() {
+        if (!::stageResolver.isInitialized || !hasLocationPermission()) return
+        val fix = awaitCurrentLocation()
+        if (fix == null) {
+            applicationContext.writeStageState(StageState(isGpsAvailable = false, lastUpdateMillis = System.currentTimeMillis()))
+            requestComplicationUpdate()
+            Log.d(TAG, "Force fetch: no fix")
+            return
+        }
+        Log.d(TAG, "Force fetch: ${fix.latitude},${fix.longitude} acc=${fix.accuracy}")
+        publish(stageResolver.resolve(fix.latitude, fix.longitude, ZonedDateTime.now()))
+    }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -381,9 +400,12 @@ class LocationForegroundService : Service() {
         private const val CHANNEL_ID = "location_service"
         private const val NOTIFICATION_ID = 1
 
+        /** Sent from the dev menu to force a one-shot location fetch. */
+        const val ACTION_FORCE_FETCH = "dev.girg.qwatch.FORCE_FETCH"
+
         // Adaptive interval / gating constants (tunable).
         private const val DUMB_INTERVAL_MS = 30_000L
-        private const val ACTIVE_MOVING_MS = 10_000L
+        private const val ACTIVE_MOVING_MS = 15_000L
         private const val ACTIVE_STILL_MS = 30_000L
         private const val CONFIRMED_MAX_MS = 120_000L
         private const val SCHEDULE_SLEEP_MS = 15 * 60_000L

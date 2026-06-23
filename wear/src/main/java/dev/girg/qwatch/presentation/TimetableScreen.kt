@@ -46,7 +46,8 @@ fun TimetableScreen(
             .background(Color.Black)
     ) {
         LazyColumn(
-            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 20.dp)
+            // Extra bottom padding lets the final set scroll up clear of the round screen's curve.
+            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 40.dp)
         ) {
             item {
                 Text(

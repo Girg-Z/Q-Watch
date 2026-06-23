@@ -92,7 +92,7 @@ fun StageListScreen(
                         .clip(RoundedCornerShape(14.dp))
                         .background(Color(0xFF161616))
                         .clickable { onNavigateToFavourites() }
-                        .padding(vertical = 12.dp),
+                        .padding(vertical = 10.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(

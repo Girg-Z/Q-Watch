@@ -39,7 +39,9 @@ import dev.girg.qwatch.complication.NextArtistComplicationService
 import dev.girg.qwatch.complication.NowPlayingComplicationService
 import dev.girg.qwatch.complication.StageComplicationService
 import dev.girg.qwatch.data.StageState
+import dev.girg.qwatch.data.readSmartModeFlow
 import dev.girg.qwatch.data.readStageStateFlow
+import dev.girg.qwatch.data.writeSmartMode
 import dev.girg.qwatch.data.writeStageState
 import dev.girg.qwatch.presentation.theme.QWatchTheme
 import dev.girg.qwatch.service.LocationForegroundService
@@ -60,21 +62,26 @@ class MainActivity : ComponentActivity() {
     // Bumped whenever a new intent asks us to jump to the stage list screen (e.g. watch-face tap).
     private val openStagesRequest = mutableStateOf(0)
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) startLocationService()
+    private val requestPermissionsLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { results ->
+        if (results[android.Manifest.permission.ACCESS_FINE_LOCATION] == true) startLocationService()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-            == PackageManager.PERMISSION_GRANTED
-        ) {
-            startLocationService()
-        } else {
-            requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+        val fineGranted = ContextCompat.checkSelfPermission(
+            this, android.Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        // Location is required; ACTIVITY_RECOGNITION is optional (only sharpens the smart interval).
+        if (fineGranted) startLocationService()
+        val toRequest = buildList {
+            if (!fineGranted) add(android.Manifest.permission.ACCESS_FINE_LOCATION)
+            if (ContextCompat.checkSelfPermission(this@MainActivity, android.Manifest.permission.ACTIVITY_RECOGNITION)
+                != PackageManager.PERMISSION_GRANTED
+            ) add(android.Manifest.permission.ACTIVITY_RECOGNITION)
         }
+        if (toRequest.isNotEmpty()) requestPermissionsLauncher.launch(toRequest.toTypedArray())
 
         if (intent?.getBooleanExtra(AppLauncher.EXTRA_OPEN_STAGES, false) == true) {
             openStagesRequest.value++
@@ -145,6 +152,7 @@ private fun AppContent(context: Context, timetableRepo: TimetableRepository, ope
 @Composable
 fun DebugScreen(context: Context) {
     val state by context.readStageStateFlow().collectAsState(initial = StageState())
+    val smartMode by context.readSmartModeFlow().collectAsState(initial = true)
     val scope = rememberCoroutineScope()
     val listState = rememberTransformingLazyColumnState()
     val transformSpec = rememberTransformationSpec()
@@ -191,6 +199,14 @@ fun DebugScreen(context: Context) {
                         },
                         modifier = Modifier.fillMaxWidth()
                     )
+                }
+
+                item {
+                    Button(
+                        onClick = { scope.launch { context.writeSmartMode(!smartMode) } },
+                        modifier = Modifier.fillMaxWidth().transformedHeight(this, transformSpec),
+                        transformation = SurfaceTransformation(transformSpec)
+                    ) { Text("Mode: ${if (smartMode) "SMART" else "DUMB"}") }
                 }
 
                 item {

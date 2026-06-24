@@ -68,6 +68,6 @@ class NowPlayingComplicationService : SuspendingComplicationDataSourceService() 
         if (name.length > max) name.take(max - 1).trimEnd() + "…" else name
 
     private companion object {
-        const val MAX_TITLE_CHARS = 32
+        const val MAX_TITLE_CHARS = 21
     }
 }

@@ -1,5 +1,6 @@
 package dev.girg.qwatch.service
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -164,11 +165,14 @@ class LocationForegroundService : Service() {
         removeActivityUpdates()
     }
 
+    // Permission is guaranteed: strategies only start after onCreate's hasLocationPermission() gate.
+    @SuppressLint("MissingPermission")
     private fun startDumbStrategy() {
         val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, DUMB_INTERVAL_MS).build()
         fusedLocationClient.requestLocationUpdates(request, locationCallback, Looper.getMainLooper())
     }
 
+    @SuppressLint("MissingPermission")
     private fun startSmartStrategy() {
         // Free fix cache + motion signal, both only active while smart mode runs.
         val passiveRequest = LocationRequest.Builder(Priority.PRIORITY_PASSIVE, PASSIVE_INTERVAL_MS).build()
@@ -248,6 +252,7 @@ class LocationForegroundService : Service() {
         return age in 0..MAX_FIX_AGE_MS
     }
 
+    @SuppressLint("MissingPermission") // guarded by hasLocationPermission() above
     private suspend fun awaitCurrentLocation(): Location? {
         if (!hasLocationPermission()) return null
         return suspendCancellableCoroutine { cont ->

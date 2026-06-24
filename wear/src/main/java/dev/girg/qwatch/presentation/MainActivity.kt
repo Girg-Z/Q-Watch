@@ -1,5 +1,6 @@
 package dev.girg.qwatch.presentation
 
+import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -63,6 +64,9 @@ class MainActivity : ComponentActivity() {
     // Bumped whenever a new intent asks us to jump to the stage list screen (e.g. watch-face tap).
     private val openStagesRequest = mutableStateOf(0)
 
+    // ComponentActivity (Compose) handles ActivityResult correctly; the Fragment-version lint
+    // check does not apply since we don't use FragmentActivity.
+    @SuppressLint("InvalidFragmentVersionForActivityResult")
     private val requestPermissionsLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { results ->

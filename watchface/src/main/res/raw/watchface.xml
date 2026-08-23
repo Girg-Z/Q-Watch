@@ -34,11 +34,11 @@
             <Complication type="RANGED_VALUE">
                 <!-- Artist name — stage color (own-slot Font color confirmed working) -->
                 <!-- Inset 50px each side so the name clears the progress ring at the edges. -->
-                <PartText x="25" y="172" width="400" height="68">
+                <PartText x="25" y="163" width="400" height="86">
                     <Variant mode="AMBIENT" target="alpha" value="0" />
-                    <!-- isAutoSize: 44 is the max; longer names shrink to fit, then ellipsis if still too wide. -->
+                    <!-- isAutoSize: 76 is the max; longer names shrink to fit, then ellipsis if still too wide. -->
                     <Text align="CENTER" isAutoSize="TRUE" maxLines="1" ellipsis="TRUE">
-                        <Font family="SYNC_TO_DEVICE" size="64" color="[COMPLICATION.TEXT]" weight="BOLD">
+                        <Font family="SYNC_TO_DEVICE" size="84" color="[COMPLICATION.TEXT]" weight="BOLD">
                             <Template>%s<Parameter expression="[COMPLICATION.TITLE]" /></Template>
                         </Font>
                     </Text>
@@ -92,10 +92,10 @@
                 primaryProvider="dev.girg.qwatch/dev.girg.qwatch.complication.CountdownComplicationService"
                 primaryProviderType="SHORT_TEXT" />
             <Complication type="SHORT_TEXT">
-                <PartText x="0" y="293" width="450" height="22">
+                <PartText x="0" y="272" width="450" height="26">
                     <Variant mode="AMBIENT" target="alpha" value="0" />
                     <Text align="CENTER">
-                        <Font family="SYNC_TO_DEVICE" size="15" color="#B4B4B4">
+                        <Font family="SYNC_TO_DEVICE" size="21" color="#B4B4B4">
                             <Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template>
                         </Font>
                     </Text>
@@ -120,54 +120,19 @@
                 primaryProviderType="SHORT_TEXT" />
             <Complication type="SHORT_TEXT">
                 <!-- "NEXT" label (complication TITLE) — empty when there is no next set. -->
-                <PartText x="40" y="322" width="370" height="14">
+                <PartText x="40" y="310" width="370" height="20">
                     <Variant mode="AMBIENT" target="alpha" value="0" />
                     <Text align="CENTER" maxLines="1">
-                        <Font family="SYNC_TO_DEVICE" size="11" color="#6F6F6F">
+                        <Font family="SYNC_TO_DEVICE" size="16" color="#6F6F6F">
                             <Template>%s<Parameter expression="[COMPLICATION.TITLE]" /></Template>
                         </Font>
                     </Text>
                 </PartText>
-                <!-- Next artist name below the label; 16 is the max, auto-shrinks to fit. -->
-                <PartText x="40" y="336" width="370" height="24">
+                <!-- Next artist name below the label; 30 is the max, auto-shrinks to fit. -->
+                <PartText x="40" y="332" width="370" height="40">
                     <Variant mode="AMBIENT" target="alpha" value="0" />
                     <Text align="CENTER" isAutoSize="TRUE" maxLines="1">
-                        <Font family="SYNC_TO_DEVICE" size="16" color="#B4B4B4">
-                            <Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template>
-                        </Font>
-                    </Text>
-                </PartText>
-            </Complication>
-        </ComplicationSlot>
-
-        <!-- ================================================================
-             SLOT 3 — next favourite set (SHORT_TEXT): "★ Headhunterz" or ""
-               Small, secondary line near the top of the face. Its tap box is
-               sized to this line (and kept non-overlapping with the other
-               slots) so tapping the favourite name opens the wear app on the
-               stage list screen (tap action is attached to the complication
-               data itself).
-             ================================================================ -->
-        <ComplicationSlot
-            slotId="3"
-            supportedTypes="SHORT_TEXT"
-            name="next_favourite"
-            isCustomizable="FALSE"
-            x="0" y="0" width="450" height="450">
-            <!-- Tap target = the "★ artist" line itself; tapping it opens the stage list screen. -->
-            <BoundingBox x="40" y="82" width="370" height="62" />
-            <DefaultProviderPolicy
-                defaultSystemProvider="EMPTY"
-                defaultSystemProviderType="SHORT_TEXT"
-                primaryProvider="dev.girg.qwatch/dev.girg.qwatch.complication.NextFavouriteComplicationService"
-                primaryProviderType="SHORT_TEXT" />
-            <Complication type="SHORT_TEXT">
-                <!-- Width matches the tap BoundingBox (x=40 w=370) above. -->
-                <PartText x="40" y="104" width="370" height="22">
-                    <Variant mode="AMBIENT" target="alpha" value="0" />
-                    <!-- 16 is the max; longer favourite names auto-shrink to fit. -->
-                    <Text align="CENTER" isAutoSize="TRUE" maxLines="1">
-                        <Font family="SYNC_TO_DEVICE" size="16" color="#E0C24A">
+                        <Font family="SYNC_TO_DEVICE" size="30" color="#B4B4B4">
                             <Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template>
                         </Font>
                     </Text>
@@ -177,8 +142,9 @@
 
         <!-- ================================================================
              CLOCK — active mode (hidden in ambient)
+             Sits above the artist name, near the top of the face.
              ================================================================ -->
-        <DigitalClock x="0" y="244" width="450" height="48">
+        <DigitalClock x="0" y="96" width="450" height="48">
             <TimeText format="hh:mm" hourFormat="24" align="CENTER"
                       x="0" y="0" width="450" height="48">
                 <Variant mode="AMBIENT" target="alpha" value="0" />

@@ -24,7 +24,7 @@ class NextArtistComplicationService : SuspendingComplicationDataSourceService() 
     /** Name goes in TEXT, the static "NEXT" label in TITLE (so the watch face can stack them). */
     private fun makeData(name: String) =
         ShortTextComplicationData.Builder(
-            text = PlainComplicationText.Builder(name).build(),
+            text = PlainComplicationText.Builder(ellipsize(name)).build(),
             contentDescription = PlainComplicationText.Builder(
                 if (name.isEmpty()) "" else "Next: $name"
             ).build()
@@ -35,4 +35,12 @@ class NextArtistComplicationService : SuspendingComplicationDataSourceService() 
             // Full-screen slot: carry the tap action so a tap landing here still opens the app.
             .setTapAction(AppLauncher.stages(applicationContext))
             .build()
+
+    /** Cap the displayed name so the watch face never has to render more than [MAX_TITLE_CHARS]. */
+    private fun ellipsize(name: String, max: Int = MAX_TITLE_CHARS): String =
+        if (name.length > max) name.take(max - 1).trimEnd() + "…" else name
+
+    private companion object {
+        const val MAX_TITLE_CHARS = 21
+    }
 }

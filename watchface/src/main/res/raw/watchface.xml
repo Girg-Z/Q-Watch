@@ -33,26 +33,28 @@
                 primaryProviderType="RANGED_VALUE" />
             <Complication type="RANGED_VALUE">
                 <!-- Artist name — stage color (own-slot Font color confirmed working) -->
-                <PartText x="0" y="172" width="450" height="68">
+                <!-- Inset 50px each side so the name clears the progress ring at the edges. -->
+                <PartText x="25" y="172" width="400" height="68">
                     <Variant mode="AMBIENT" target="alpha" value="0" />
-                    <Text align="CENTER">
-                        <Font family="SYNC_TO_DEVICE" size="52" color="[COMPLICATION.TEXT]" weight="BOLD">
+                    <!-- isAutoSize: 44 is the max; longer names shrink to fit, then ellipsis if still too wide. -->
+                    <Text align="CENTER" isAutoSize="TRUE" maxLines="1" ellipsis="TRUE">
+                        <Font family="SYNC_TO_DEVICE" size="64" color="[COMPLICATION.TEXT]" weight="BOLD">
                             <Template>%s<Parameter expression="[COMPLICATION.TITLE]" /></Template>
                         </Font>
                     </Text>
                 </PartText>
                 <!-- Arc track — full circle at 16% opacity -->
-                <PartDraw x="18" y="18" width="414" height="414" alpha="41">
+                <PartDraw x="6" y="6" width="438" height="438" alpha="41">
                     <Variant mode="AMBIENT" target="alpha" value="0" />
-                    <Arc centerX="207" centerY="207" width="414" height="414"
+                    <Arc centerX="219" centerY="219" width="438" height="438"
                         direction="CLOCKWISE" startAngle="0" endAngle="360">
                         <Stroke cap="ROUND" color="[COMPLICATION.TEXT]" thickness="13" />
                     </Arc>
                 </PartDraw>
                 <!-- Arc fill — progress sweep, full opacity -->
-                <PartDraw x="18" y="18" width="414" height="414">
+                <PartDraw x="6" y="6" width="438" height="438">
                     <Variant mode="AMBIENT" target="alpha" value="0" />
-                    <Arc centerX="207" centerY="207" width="414" height="414"
+                    <Arc centerX="219" centerY="219" width="438" height="438"
                         direction="CLOCKWISE" startAngle="0.0" endAngle="0.0">
                         <Stroke cap="ROUND" color="[COMPLICATION.TEXT]" thickness="13" />
                         <Transform
@@ -61,9 +63,9 @@
                     </Arc>
                 </PartDraw>
                 <!-- Arc fill — ambient, thin stroke at 30% opacity -->
-                <PartDraw x="18" y="18" width="414" height="414" alpha="0">
+                <PartDraw x="6" y="6" width="438" height="438" alpha="0">
                     <Variant mode="AMBIENT" target="alpha" value="77" />
-                    <Arc centerX="207" centerY="207" width="414" height="414"
+                    <Arc centerX="219" centerY="219" width="438" height="438"
                         direction="CLOCKWISE" startAngle="0.0" endAngle="0.0">
                         <Stroke cap="ROUND" color="[COMPLICATION.TEXT]" thickness="3" />
                         <Transform
@@ -90,10 +92,10 @@
                 primaryProvider="dev.girg.qwatch/dev.girg.qwatch.complication.CountdownComplicationService"
                 primaryProviderType="SHORT_TEXT" />
             <Complication type="SHORT_TEXT">
-                <PartText x="0" y="303" width="450" height="20">
+                <PartText x="0" y="293" width="450" height="22">
                     <Variant mode="AMBIENT" target="alpha" value="0" />
                     <Text align="CENTER">
-                        <Font family="SYNC_TO_DEVICE" size="13" color="#B4B4B4">
+                        <Font family="SYNC_TO_DEVICE" size="15" color="#B4B4B4">
                             <Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template>
                         </Font>
                     </Text>
@@ -117,10 +119,55 @@
                 primaryProvider="dev.girg.qwatch/dev.girg.qwatch.complication.NextArtistComplicationService"
                 primaryProviderType="SHORT_TEXT" />
             <Complication type="SHORT_TEXT">
-                <PartText x="0" y="330" width="450" height="20">
+                <!-- "NEXT" label (complication TITLE) — empty when there is no next set. -->
+                <PartText x="40" y="322" width="370" height="14">
                     <Variant mode="AMBIENT" target="alpha" value="0" />
-                    <Text align="CENTER">
-                        <Font family="SYNC_TO_DEVICE" size="14" color="#B4B4B4">
+                    <Text align="CENTER" maxLines="1">
+                        <Font family="SYNC_TO_DEVICE" size="11" color="#6F6F6F">
+                            <Template>%s<Parameter expression="[COMPLICATION.TITLE]" /></Template>
+                        </Font>
+                    </Text>
+                </PartText>
+                <!-- Next artist name below the label; 16 is the max, auto-shrinks to fit. -->
+                <PartText x="40" y="336" width="370" height="24">
+                    <Variant mode="AMBIENT" target="alpha" value="0" />
+                    <Text align="CENTER" isAutoSize="TRUE" maxLines="1">
+                        <Font family="SYNC_TO_DEVICE" size="16" color="#B4B4B4">
+                            <Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template>
+                        </Font>
+                    </Text>
+                </PartText>
+            </Complication>
+        </ComplicationSlot>
+
+        <!-- ================================================================
+             SLOT 3 — next favourite set (SHORT_TEXT): "★ Headhunterz" or ""
+               Small, secondary line near the top of the face. Its tap box is
+               sized to this line (and kept non-overlapping with the other
+               slots) so tapping the favourite name opens the wear app on the
+               stage list screen (tap action is attached to the complication
+               data itself).
+             ================================================================ -->
+        <ComplicationSlot
+            slotId="3"
+            supportedTypes="SHORT_TEXT"
+            name="next_favourite"
+            isCustomizable="FALSE"
+            x="0" y="0" width="450" height="450">
+            <!-- Tap target = the "★ artist" line itself; tapping it opens the stage list screen. -->
+            <BoundingBox x="40" y="82" width="370" height="62" />
+            <DefaultProviderPolicy
+                defaultSystemProvider="EMPTY"
+                defaultSystemProviderType="SHORT_TEXT"
+                primaryProvider="dev.girg.qwatch/dev.girg.qwatch.complication.NextFavouriteComplicationService"
+                primaryProviderType="SHORT_TEXT" />
+            <Complication type="SHORT_TEXT">
+                <!-- Width matches the tap BoundingBox (x=40 w=370) above. -->
+                <PartText x="40" y="104" width="370" height="22">
+                    <Variant mode="AMBIENT" target="alpha" value="0" />
+                    <!-- 16 is the max; longer favourite names auto-shrink to fit. -->
+                    <Text align="CENTER" isAutoSize="TRUE" maxLines="1">
+                        <Font family="SYNC_TO_DEVICE" size="16" color="#E0C24A">
                             <Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template>
                         </Font>
                     </Text>
@@ -131,11 +178,11 @@
         <!-- ================================================================
              CLOCK — active mode (hidden in ambient)
              ================================================================ -->
-        <DigitalClock x="0" y="252" width="450" height="48">
+        <DigitalClock x="0" y="244" width="450" height="48">
             <TimeText format="hh:mm" hourFormat="24" align="CENTER"
                       x="0" y="0" width="450" height="48">
                 <Variant mode="AMBIENT" target="alpha" value="0" />
-                <Font family="SYNC_TO_DEVICE" size="36" color="#E6E6E6" />
+                <Font family="SYNC_TO_DEVICE" size="37" color="#E6E6E6" />
             </TimeText>
         </DigitalClock>
 

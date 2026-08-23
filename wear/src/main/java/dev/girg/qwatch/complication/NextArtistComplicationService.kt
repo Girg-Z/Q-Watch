@@ -13,19 +13,26 @@ class NextArtistComplicationService : SuspendingComplicationDataSourceService() 
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
         if (type != ComplicationType.SHORT_TEXT) return null
-        return makeData("NEXT · Headhunterz")
+        return makeData("Headhunterz")
     }
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
         val state = applicationContext.readStageStateFlow().first()
-        return makeData(
-            if (state.nextArtistName != null) "NEXT · ${state.nextArtistName}" else ""
-        )
+        return makeData(state.nextArtistName ?: "")
     }
 
-    private fun makeData(text: String) =
+    /** Name goes in TEXT, the static "NEXT" label in TITLE (so the watch face can stack them). */
+    private fun makeData(name: String) =
         ShortTextComplicationData.Builder(
-            text = PlainComplicationText.Builder(text).build(),
-            contentDescription = PlainComplicationText.Builder(text).build()
-        ).build()
+            text = PlainComplicationText.Builder(name).build(),
+            contentDescription = PlainComplicationText.Builder(
+                if (name.isEmpty()) "" else "Next: $name"
+            ).build()
+        )
+            .apply {
+                if (name.isNotEmpty()) setTitle(PlainComplicationText.Builder("NEXT").build())
+            }
+            // Full-screen slot: carry the tap action so a tap landing here still opens the app.
+            .setTapAction(AppLauncher.stages(applicationContext))
+            .build()
 }

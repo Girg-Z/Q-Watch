@@ -41,6 +41,7 @@ class NowPlayingComplicationService : SuspendingComplicationDataSourceService() 
         "green"                 -> "#00FF00"
         "yellow"                -> "#F1E300"
         "gold"                  -> "#BB9551"
+        "orange"                -> "#FF6500"
         "orange_light_district" -> "#FF6500"
         "purple"                -> "#A100FF"
         "silver"                -> "#DADADA"
@@ -53,9 +54,20 @@ class NowPlayingComplicationService : SuspendingComplicationDataSourceService() 
             value = value,
             min = 0f,
             max = 100f,
+            // Full name for accessibility; the visible title is capped below.
             contentDescription = PlainComplicationText.Builder(artistName).build()
         )
             .setText(PlainComplicationText.Builder(hexColor).build())
-            .setTitle(PlainComplicationText.Builder(artistName).build())
+            .setTitle(PlainComplicationText.Builder(ellipsize(artistName)).build())
+            // Slot 0 spans the whole face, so this makes a tap anywhere open the stage list screen.
+            .setTapAction(AppLauncher.stages(applicationContext))
             .build()
+
+    /** Cap the displayed name so the watch face never has to render more than [MAX_TITLE_CHARS]. */
+    private fun ellipsize(name: String, max: Int = MAX_TITLE_CHARS): String =
+        if (name.length > max) name.take(max - 1).trimEnd() + "…" else name
+
+    private companion object {
+        const val MAX_TITLE_CHARS = 21
+    }
 }

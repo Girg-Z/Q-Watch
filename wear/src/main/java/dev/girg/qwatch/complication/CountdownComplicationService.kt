@@ -25,5 +25,8 @@ class CountdownComplicationService : SuspendingComplicationDataSourceService() {
         ShortTextComplicationData.Builder(
             text = PlainComplicationText.Builder(text).build(),
             contentDescription = PlainComplicationText.Builder("Countdown").build()
-        ).build()
+        )
+            // Full-screen slot: carry the tap action so a tap landing here still opens the app.
+            .setTapAction(AppLauncher.stages(applicationContext))
+            .build()
 }
